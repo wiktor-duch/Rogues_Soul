@@ -13,17 +13,12 @@ class TILE_TYPE(Enum):
     ENTRANCE = 5
 
 class Tile:
-    def __init__(self, blocked: bool, block_sight: bool = None):
+    def __init__(self):
         """
-        A tile on a map. Can block movement and sight.
+        A tile on a map. Can block movement and sight if not discovered.
         """
         
-        self.blocked = blocked
-        
-        # By default, if a tile is blocked/undiscovered, it also blocks the sight
-        if block_sight is None:
-            block_sight = blocked
-        
-        self.block_sight = block_sight
+        self.blocked = True
+        self.discovered = False
 
         self.type = TILE_TYPE.BACKGROUND

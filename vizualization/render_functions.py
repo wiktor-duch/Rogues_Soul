@@ -7,7 +7,8 @@ def render_all(
     entities: List[Entity],
     map: Map,
     terminal_width: int,
-    terminal_height: int
+    terminal_height: int,
+    GAME_MODE_ON: bool
     ) -> None:
     '''
     Renders the entire map.
@@ -15,22 +16,40 @@ def render_all(
     
     for y in range(terminal_height):
         for x in range(terminal_width):
-            background = map.tiles[y][x].block_sight
-            if background:
-                print(' ', end='')
+            # If tile is undiscovered is rendered as a space
+            if GAME_MODE_ON:
+                if not map.tiles[y][x].discovered:
+                    print(' ', end='')
+                else:
+                    entity_drawn = draw_entity(entities, x, y)
+                    if entity_drawn is False:
+                        if map.tiles[y][x].type == TILE_TYPE.V_WALL:
+                            print("|", end="")
+                        elif map.tiles[y][x].type == TILE_TYPE.H_WALL:
+                            print("-", end="")
+                        elif map.tiles[y][x].type == TILE_TYPE.CORRIDOR:
+                            print('#', end='')
+                        elif map.tiles[y][x].type == TILE_TYPE.ENTRANCE:
+                            print('+', end='')
+                        else:
+                            print('.', end='')
+            # Activates development mode
             else:
-                entity_drawn = draw_entity(entities, x, y)
-                if entity_drawn is False:
-                    if map.tiles[y][x].type == TILE_TYPE.V_WALL:
-                        print("|", end="")
-                    elif map.tiles[y][x].type == TILE_TYPE.H_WALL:
-                        print("-", end="")
-                    elif map.tiles[y][x].type == TILE_TYPE.CORRIDOR:
-                        print('#', end='')
-                    elif map.tiles[y][x].type == TILE_TYPE.ENTRANCE:
-                        print('+', end='')
-                    else:
-                        print('.', end='')
+                if map.tiles[y][x].type == TILE_TYPE.BACKGROUND:
+                    print(' ', end='')
+                else:
+                    entity_drawn = draw_entity(entities, x, y)
+                    if entity_drawn is False:
+                        if map.tiles[y][x].type == TILE_TYPE.V_WALL:
+                            print("|", end="")
+                        elif map.tiles[y][x].type == TILE_TYPE.H_WALL:
+                            print("-", end="")
+                        elif map.tiles[y][x].type == TILE_TYPE.CORRIDOR:
+                            print('#', end='')
+                        elif map.tiles[y][x].type == TILE_TYPE.ENTRANCE:
+                            print('+', end='')
+                        else:
+                            print('.', end='')
         print('')
 
 def draw_entity(entities: List[Entity], x_coord: int, y_coord: int) -> bool:

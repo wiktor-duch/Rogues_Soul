@@ -1,8 +1,6 @@
 from engine import Engine
-from input_handler import handle_keys
 from entity import Entity
 from map_objects.map import Map
-import engine
 
 '''
 Based on:
@@ -20,7 +18,7 @@ def main():
     room_min_size = 4 # Cannot be below 4 as otherwise it generates errors
     max_rooms = 12
     min_rooms = 6
-    
+    GAME_MODE_ON = True # Hides the undiscovered tiles if True
     print('Rogue\'s Soul')
 
     # Create entities
@@ -33,7 +31,7 @@ def main():
     map.generate_dungeon(min_rooms, max_rooms, room_min_size, room_max_size, terminal_width, terminal_height, agent)
     
     #Initialize engine
-    engine = Engine(entities, agent, map)
+    engine = Engine(entities, agent, map, GAME_MODE_ON)
 
     # Game mainloop
     gameOver = False

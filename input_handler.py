@@ -1,6 +1,6 @@
-from typing import Tuple as tuple, Dict as dict
+from typing import Tuple, Dict as dict
 
-def handle_keys(key: str) -> (dict[str, tuple[int, int]] or dict[str, bool]):
+def handle_keys(key: str) -> (dict[str, Tuple[int, int]] or dict[str, bool]):
     if key == '1': # LEFT
         return {'move': (-1,0)}
     elif key == '2': # UP
@@ -12,6 +12,9 @@ def handle_keys(key: str) -> (dict[str, tuple[int, int]] or dict[str, bool]):
     
     elif key == 'q' or key == 'Q': # EXIT
         return {'exit': True}
+
+    elif key == 'm': # CHANGE MODE
+        return {'mode': True}
 
     else:
         return {}
