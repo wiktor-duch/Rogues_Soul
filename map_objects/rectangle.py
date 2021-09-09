@@ -11,7 +11,7 @@ class Rectangle:
         self.x2 = x_coord + width
         self.y2 = y_coord + height
     
-    def center(self) -> tuple[int, int]:
+    def center(self) -> tuple[int]:
         '''
         Returns the center coordinates of a rectangle
         '''
@@ -30,7 +30,7 @@ class Rectangle:
         return (self.x1-1 <= other.x2 and self.x2+1 >= other.x1 and
             self.y1-1 <= other.y2 and self.y2+1 >= other.y1)
     
-    def intersect_tile(self, x, y) -> bool:
+    def intersect_tile_at(self, x, y) -> bool:
         '''
         Returns true if a tile intersects a room.
         '''
