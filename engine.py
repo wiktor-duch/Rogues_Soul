@@ -6,12 +6,11 @@ from map_objects.map import Map
 from typing import List
 
 class Engine:
-    def __init__(self, entities: List[Entity], agent: Entity, map: Map, GAME_MODE_ON: bool):
+    def __init__(self, agent: Entity, map: Map, GAME_MODE_ON: bool):
         '''
         Initializes the engine that handles game's logic
         '''
 
-        self.entities = entities
         self.agent = agent
         self.map = map
         self.GAME_MODE_ON = GAME_MODE_ON
@@ -28,7 +27,7 @@ class Engine:
             dx, dy = move
             if not self.map.is_blocked(self.agent.x+dx, self.agent.y+dy):
                 self.agent.move(dx, dy)
-                discover_tiles(self.map, self.agent)
+                discover_tiles(self.map, self.agent) # Discovers tiles ahead of the agent 
             return False
         
         if exit:
@@ -40,5 +39,5 @@ class Engine:
             else:
                 self.GAME_MODE_ON = True
 
-    def render(self, terminal_width: int, terminal_height: int) -> None:
-        render_all(self.entities, self.map, terminal_width, terminal_height, self.GAME_MODE_ON)
+    def render(self) -> None:
+        render_all(self.map, self.GAME_MODE_ON)

@@ -2,16 +2,16 @@ from entity import Entity
 from map_objects.tile import Tile, TILE_TYPE
 from map_objects.rectangle import Rectangle as Rect
 from random import randint
-from typing import List
+from typing import Iterable, List
 
 class Map:
-    def __init__(self, width: int, height: int):
+    def __init__(self, width: int, height: int, entities: Iterable[Entity]=()):
         '''
         Generates a new game map.
         '''
 
-        self.width = width
-        self.height = height
+        self.width, self.height = width, height
+        self.entities = set(entities)
         self.tiles = self.initialize_tiles()
         self.rooms = []
 
@@ -33,6 +33,9 @@ class Map:
         
         return False
     
+    def place_enemies(self, room: Rect, entities: List[Entity], max_monsters_per_room):
+        pass
+
     def create_vert_tunnel(self, y1: int, y2: int, x: int) -> None:
         '''
         Creates a vertical tunnel between y1 and y2 at x.
@@ -227,6 +230,7 @@ class Map:
         max_rooms: int,
         room_min_size: int,
         room_max_size: int,
+        max_monsters_per_room: int,
         map_width: int,
         map_height: int, 
         agent: Entity
@@ -278,6 +282,7 @@ class Map:
                 if not intersection:
                     # There are no intersections, so this room is valid
                     self.create_room(new_room)
+                    self.place_entities(new_room, max_monsters_per_room)
                     self.rooms.append(new_room)
                     num_rooms += 1
                 
