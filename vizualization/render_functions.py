@@ -1,9 +1,9 @@
 from map_objects.map import Map
-from entity import Entity
+from entities.entity import Entity
 from typing import Set
 from map_objects.tile import TILE_TYPE
 
-def render_all(map: Map, GAME_MODE_ON: bool) -> None:
+def render_map(map: Map, GAME_MODE_ON: bool) -> None:
     '''
     Renders the entire map.
     '''

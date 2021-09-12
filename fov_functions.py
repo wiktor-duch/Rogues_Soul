@@ -1,4 +1,4 @@
-from entity import Entity
+from entities.entity import Entity
 from map_objects.tile import TILE_TYPE, Tile
 from map_objects.map import Map
 from typing import Tuple
@@ -32,7 +32,7 @@ def discover_tiles(map: Map, agent: Entity) -> None:
     elif map.tiles[agent.y][agent.x].type == TILE_TYPE.ENTRANCE:
         # Check which room agent is about to enter
         for room in map.rooms:
-            if room.intersect_tile_at(agent.x, agent.y):
+            if room.intersects_tile_at(agent.x, agent.y):
                 room_x, room_y = room.center()
                 # If room is not discovered yet
                 if map.tiles[room_y][room_x].discovered is False:

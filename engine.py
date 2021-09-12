@@ -1,5 +1,5 @@
-from entity import Entity
-from vizualization.render_functions import render_all
+from entities.entity import Entity
+from vizualization.render_functions import render_map
 from input_handler import handle_keys
 from fov_functions import discover_tiles
 from map_objects.map import Map
@@ -40,4 +40,6 @@ class Engine:
                 self.GAME_MODE_ON = True
 
     def render(self) -> None:
-        render_all(self.map, self.GAME_MODE_ON)
+        print('Rogue\'s Soul')
+        render_map(self.map, self.GAME_MODE_ON)
+        # TODO: print interface with stats

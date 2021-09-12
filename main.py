@@ -1,6 +1,8 @@
+from copy import deepcopy
+
 from engine import Engine
-from entity import Entity
-from map_objects.map import Map
+from entities import entity_factory
+from map_generator import generate_dungeon
 
 '''
 Based on:
@@ -19,19 +21,20 @@ def main():
     max_rooms = 12
     min_rooms = 6
     max_monsters_per_room = 2
+    min_monsters_per_room = 0
     GAME_MODE_ON = True # Hides the undiscovered tiles if True
-    print('Rogue\'s Soul')
+    print('Loading Rogue\'s Soul')
 
-    # Create entities
-    agent = Entity(int(terminal_width/2), int(terminal_height/2), '@')
+    # Spawns an agent
+    agent = deepcopy(entity_factory.agent)
 
     # Create map
-    map = Map(terminal_width, terminal_height, entities=[agent])
-    map.generate_dungeon(
+    map = generate_dungeon(
         min_rooms, 
         max_rooms, 
-        room_min_size, 
+        room_min_size,
         room_max_size,
+        min_monsters_per_room,
         max_monsters_per_room,
         terminal_width, 
         terminal_height, 
