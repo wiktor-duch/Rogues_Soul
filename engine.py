@@ -1,7 +1,7 @@
 from entities.entity import Entity
 from vizualization.render_functions import render_map
-from input_handler import handle_keys
-from fov_functions import discover_tiles
+from handlers.input_handler import handle_keys
+from vizualization.fov_functions import discover_tiles
 from map_objects.map import Map
 from typing import List
 

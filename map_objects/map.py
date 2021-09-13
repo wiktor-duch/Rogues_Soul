@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from map_objects.tile import Tile
 from map_objects.rectangle import Rectangle as Rect
-from typing import Iterable, List, TYPE_CHECKING
+from typing import Iterable, Optional, List, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from entities.entity import Entity
@@ -14,8 +14,15 @@ class Map:
     def __init__(self, width: int, height: int, entities: Iterable[Entity]=()):
         self.width, self.height = width, height
         self.entities = set(entities)
-        self.tiles = self.initialize_tiles()
-        self.rooms = []
+        self.tiles: List[Tile] = self.initialize_tiles()
+        self.rooms: List[Rect] = []
+
+    def get_blocking_entity(self, x_coord: int, y_coord: int) -> Optional[Entity]:
+        for entity in self.entities:
+            if entity.blocks_movement and entity.x == x_coord and entity.y == y_coord:
+                return entity
+        
+        return None
 
     def initialize_tiles(self) -> List[List[Tile]]:
         '''
