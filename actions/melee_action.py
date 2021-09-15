@@ -9,11 +9,11 @@ if TYPE_CHECKING:
     from entities.entity import Entity
 
 class MeleeAction(ActionWithDirection):
-    def perform(self, engine: Engine, entity: Entity) -> None:
-        dest_x = entity.x + self.dx
-        dest_y = entity.y + self.dy
-        target = engine.map.get_blocking_entity_at(dest_x, dest_y)
+    def perform(self) -> None:
+        
+        target = self.blocking_entity
+
         if not target:
             return  # No entity to attack.
 
-        print(f"You attacked the {target.name} with your sword!")
+        print(f"You attacked the {target.name} with your cursed sword!")

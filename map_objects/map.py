@@ -5,16 +5,18 @@ from map_objects.rectangle import Rectangle as Rect
 from typing import Iterable, Optional, List, TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from engine import Engine
     from entities.entity import Entity
 class Map:
     '''
     Generates a new game map.
     '''
 
-    def __init__(self, width: int, height: int, entities: Iterable[Entity]=()):
+    def __init__(self, engine: Engine, width: int, height: int, entities: Iterable[Entity]=()):
+        self.engine = engine
         self.width, self.height = width, height
         self.entities = set(entities)
-        self.tiles: List[Tile] = self.initialize_tiles()
+        self.tiles: List[List[Tile]] = self.initialize_tiles()
         self.rooms: List[Rect] = []
 
     def get_blocking_entity_at(self, x_coord: int, y_coord: int) -> Optional[Entity]:

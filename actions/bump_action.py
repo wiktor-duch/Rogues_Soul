@@ -11,12 +11,10 @@ if TYPE_CHECKING:
     from entities.entity import Entity
 
 class BumpAction(ActionWithDirection):
-    def perform(self, engine: Engine, entity: Entity) -> None:
-        dest_x = entity.x + self.dx
-        dest_y = entity.y + self.dy
+    def perform(self) -> None:
 
-        if engine.map.get_blocking_entity_at(dest_x, dest_y):
-            return MeleeAction(self.dx, self.dy).perform(engine, entity)
+        if self.blocking_entity:
+            return MeleeAction(self.entity, self.dx, self.dy).perform()
 
         else:
-            return MovementAction(self.dx, self.dy).perform(engine, entity)
+            return MovementAction(self.entity, self.dx, self.dy).perform()

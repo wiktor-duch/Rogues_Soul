@@ -11,6 +11,7 @@ class Rectangle:
         self.x2 = x_coord + width
         self.y2 = y_coord + height
     
+    @property
     def center(self) -> Tuple[int]:
         '''
         Returns the center coordinates of a rectangle

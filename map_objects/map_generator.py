@@ -9,7 +9,7 @@ from random import randint, random
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from entities.entity import Entity
+    from engine import Engine
   
 def place_enemies(map: Map, room: Rect, min_monsters: int, max_monsters: int):
     # Gets random number of monster in the room
@@ -22,10 +22,10 @@ def place_enemies(map: Map, room: Rect, min_monsters: int, max_monsters: int):
         if not any(entity.x == x and entity.y == y for entity in map.entities):
             if random() < 0.8:
                 # Place a Bat here
-                entity_factory.bat.spawn(map=map, x_coord=x, y_coord=y)
+                entity_factory.bat.spawn(map, x, y)
             else:
                 # Place a Demon here
-                entity_factory.demon.spawn(map=map, x_coord=x, y_coord=y)
+                entity_factory.demon.spawn(map, x, y)
 
 def generate_vert_tunnel(map: Map, y1: int, y2: int, x: int) -> None:
     '''
@@ -208,13 +208,14 @@ def generate_dungeon(
     max_monsters_per_room: int,
     map_width: int,
     map_height: int, 
-    agent: Entity
+    engine: Engine
     ) -> Map:
     '''
     Generates a new dungeon with random room layout.
     '''
 
-    dungeon = Map(map_width, map_height, entities=[agent])
+    agent = engine.agent
+    dungeon = Map(engine, map_width, map_height, entities=[agent])
 
     num_rooms = 0
 
@@ -230,12 +231,10 @@ def generate_dungeon(
         if not intersection:
             # There are no intersections, so this room is valid
             generate_room(dungeon, new_room)
-            (new_x, new_y) = new_room.center()
 
             if num_rooms == 0:
                 # Agent starts at this room
-                agent.x = new_x
-                agent.y = new_y
+                agent.place(*new_room.center, dungeon)
                 # Room is discovered
                 dungeon.discover_room(new_room)
             else:
@@ -273,10 +272,10 @@ def generate_dungeon(
     # Connecting all rooms
     for i in range(1, len(dungeon.rooms)):
         # Getting the center of a current room
-        (curr_x, curr_y) = dungeon.rooms[i].center()
+        (curr_x, curr_y) = dungeon.rooms[i].center
 
         # Getting the center of a current room
-        (prev_x, prev_y) = dungeon.rooms[i-1].center()
+        (prev_x, prev_y) = dungeon.rooms[i-1].center
 
         # Connecting the current room to the previous one
         # Flip a coin to check if we go horziontally and then vertically or the other way 

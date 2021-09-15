@@ -9,8 +9,8 @@ if TYPE_CHECKING:
     from entities.entity import Entity
 
 class SwitchModeAction(Action):
-    def perform(self, engine: Engine, entity: Entity):
-        if engine.GAME_MODE_ON is True:
-            engine.GAME_MODE_ON = False
+    def perform(self):
+        if self.engine.game_mode_on is True:
+            self.engine.game_mode_on = False
         else:
-            engine.GAME_MODE_ON = True
+            self.engine.game_mode_on = True

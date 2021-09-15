@@ -20,8 +20,8 @@ def main():
     max_rooms = 12
     min_rooms = 6
     max_monsters_per_room = 2
-    min_monsters_per_room = 0
-    GAME_MODE_ON = True # Hides the undiscovered tiles if True
+    min_monsters_per_room = 1
+    game_mode_on = True # Hides the undiscovered tiles if True
     verbose = False # Prints some additional information while game loading
     print('Loading Rogue\'s Soul...')
 
@@ -30,10 +30,13 @@ def main():
     if verbose:
         print('Player/Agent spawned...')
 
+    #Initialize engine
+    engine = Engine(agent, game_mode_on)
+
     # Create map
     if verbose:
         print('Generating the dungeon...')
-    map = generate_dungeon(
+    engine.map = generate_dungeon(
         min_rooms, 
         max_rooms, 
         room_min_size,
@@ -42,22 +45,15 @@ def main():
         max_monsters_per_room,
         terminal_width, 
         terminal_height, 
-        agent)
+        engine)
     
     if verbose:
         print('Dungeon generated..')
-
-    #Initialize engine
-    engine = Engine(agent, map, GAME_MODE_ON)
-
+ 
     # Game mainloop
     while not engine.game_over:
         engine.render()
-        
-        # Input only from player. To be changed later
-        key = input('Enter your choice: ')
-
-        engine.handle_events(key)
+        engine.event_handler.handle_events()
 
 if __name__ == '__main__':
     main()

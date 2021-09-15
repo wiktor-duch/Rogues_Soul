@@ -33,7 +33,7 @@ def discover_tiles(map: Map, agent: Entity) -> None:
         # Check which room agent is about to enter
         for room in map.rooms:
             if room.intersects_tile_at(agent.x, agent.y):
-                room_x, room_y = room.center()
+                room_x, room_y = room.center
                 # If room is not discovered yet
                 if map.tiles[room_y][room_x].discovered is False:
                     map.discover_room(room)

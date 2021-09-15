@@ -3,7 +3,7 @@ from entities.entity import Entity
 from typing import Set
 from map_objects.tile import TILE_TYPE
 
-def render_map(map: Map, GAME_MODE_ON: bool) -> None:
+def render_map(map: Map, game_mode_on: bool) -> None:
     '''
     Renders the entire map.
     '''
@@ -11,7 +11,7 @@ def render_map(map: Map, GAME_MODE_ON: bool) -> None:
     for y in range(map.height):
         for x in range(map.width):
             # If tile is undiscovered is rendered as a space
-            if GAME_MODE_ON:
+            if game_mode_on:
                 if not map.tiles[y][x].discovered:
                     print(' ', end='')
                 else:
@@ -65,5 +65,6 @@ def draw_game_title() -> None:
     '''
 
     title = ''
+    # TODO: Add intro title showing when launching
 
     print(title)

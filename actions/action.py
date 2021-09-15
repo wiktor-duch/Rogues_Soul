@@ -7,13 +7,24 @@ if TYPE_CHECKING:
     from entities.entity import Entity
 
 class Action:
-    def perform(self, engine: Engine, entity: Entity) -> None:
+    def __init__(self, entity: Entity) -> None:
+        self.entity = entity
+    
+    @property
+    def engine(self) -> Engine:
+        '''
+        Return the engine this action belongs to.
+        '''
+        
+        return self.entity.map.engine
+
+    def perform(self) -> None:
         '''
         Perform this action with the objects needed to determine its scope.
 
-        `engine` is the scope this action is being performed in.
+        `self.engine` is the scope this action is being performed in.
 
-        `entity` is the object performing the action.
+        `self.entity` is the object performing the action.
 
         This method must be overridden by Action subclasses.
         '''

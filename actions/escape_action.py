@@ -9,5 +9,5 @@ if TYPE_CHECKING:
     from entities.entity import Entity
 
 class EscapeAction(Action):
-    def perform(self, engine: Engine, entity: Entity):
-        engine.game_over = True
+    def perform(self):
+        self.engine.game_over = True
