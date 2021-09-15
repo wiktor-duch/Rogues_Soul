@@ -5,7 +5,6 @@ from actions.action import Action
 from typing import Optional, TYPE_CHECKING, Tuple
 
 if TYPE_CHECKING:
-    from engine import Engine
     from entities.entity import Entity
 
 class ActionWithDirection(Action):

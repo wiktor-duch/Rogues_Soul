@@ -5,8 +5,7 @@ from actions.action_with_direction import ActionWithDirection
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from engine import Engine
-    from entities.entity import Entity
+    from entities import Entity
 
 class MeleeAction(ActionWithDirection):
     def perform(self) -> None:

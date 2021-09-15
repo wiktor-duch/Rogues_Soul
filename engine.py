@@ -1,14 +1,12 @@
 from __future__ import annotations
-from handlers.input_handler import EventHandler
 
-from entities.entity import Entity
-from vizualization.render_functions import render_map
-from map_objects.map import Map
-from typing import TYPE_CHECKING, List
+from handlers import EventHandler
+from vizualization import render_map
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from entities.entity import Entity
-    from map_objects.map import Map
+    from entities import Entity
+    from map_objects import Map
 class Engine:
     map: Map
 

@@ -4,7 +4,7 @@ from copy import deepcopy
 from typing import Optional, Tuple, TypeVar, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from map_objects.map import Map
+    from map_objects import Map
 
 E = TypeVar('E', bound='Entity')
 

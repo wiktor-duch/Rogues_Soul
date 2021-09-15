@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from engine import Engine
-    from entities.entity import Entity
+    from entities import Entity
 
 class MovementAction(ActionWithDirection):
     def perform(self) -> None:

@@ -7,8 +7,7 @@ from actions.movement_action import MovementAction
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from engine import Engine
-    from entities.entity import Entity
+    from entities import Entity
 
 class BumpAction(ActionWithDirection):
     def perform(self) -> None:

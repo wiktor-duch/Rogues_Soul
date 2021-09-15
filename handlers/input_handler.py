@@ -2,11 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Optional
 
-from actions.action import Action
-from actions.bump_action import BumpAction
-from actions.escape_action import EscapeAction
-from actions.switch_mode_action import SwitchModeAction
-from vizualization.fov_functions import discover_tiles
+from actions import Action, BumpAction, EscapeAction, SwitchModeAction
+from vizualization import discover_tiles
 
 if TYPE_CHECKING:
     from engine import Engine

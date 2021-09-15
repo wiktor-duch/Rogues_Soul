@@ -6,7 +6,7 @@ from typing import Iterable, Optional, List, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from engine import Engine
-    from entities.entity import Entity
+    from entities import Entity
 class Map:
     '''
     Generates a new game map.
@@ -19,9 +19,9 @@ class Map:
         self.tiles: List[List[Tile]] = self.initialize_tiles()
         self.rooms: List[Rect] = []
 
-    def get_blocking_entity_at(self, x_coord: int, y_coord: int) -> Optional[Entity]:
+    def get_blocking_entity_at(self, x: int, y: int) -> Optional[Entity]:
         for entity in self.entities:
-            if entity.blocks_movement and entity.x == x_coord and entity.y == y_coord:
+            if entity.blocks_movement and entity.x == x and entity.y == y:
                 return entity
         
         return None
@@ -34,12 +34,12 @@ class Map:
         tiles = [[Tile() for x in range(self.width)] for y in range(self.height)]
         return tiles
     
-    def is_blocked(self, x_coord: int, y_coord: int) -> bool:
+    def is_blocked(self, x: int, y: int) -> bool:
         '''
         Returns true if a tile is blocked.
         '''
 
-        if self.tiles[y_coord][x_coord].blocked:
+        if self.tiles[y][x].blocked:
             return True
         
         return False

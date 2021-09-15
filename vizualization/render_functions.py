@@ -1,7 +1,6 @@
-from map_objects.map import Map
-from entities.entity import Entity
+from entities import Entity
+from map_objects import Map, TILE_TYPE
 from typing import Set
-from map_objects.tile import TILE_TYPE
 
 def render_map(map: Map, game_mode_on: bool) -> None:
     '''
