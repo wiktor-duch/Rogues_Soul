@@ -14,30 +14,17 @@ class Engine:
         self.agent = agent
         self.map = map
         self.GAME_MODE_ON = GAME_MODE_ON
+        self.game_over = False
+    
+    def handle_enemy_turns(self) -> None:
+        for entity in self.map.entities - {self.agent}:
+            pass
     
     # Handles the keys passed by the player/AI
-    def handle_events(self, key: str) -> bool:
+    def handle_events(self, key: str) -> None:
         action = handle_keys(key)
 
-        move = action.get('move')
-        exit = action.get('exit')
-        mode = action.get('mode')
-
-        if move:
-            dx, dy = move
-            if not self.map.is_blocked(self.agent.x+dx, self.agent.y+dy):
-                self.agent.move(dx, dy)
-                discover_tiles(self.map, self.agent) # Discovers tiles ahead of the agent 
-            return False
-        
-        if exit:
-            return True
-        
-        if mode:
-            if self.GAME_MODE_ON is True:
-                self.GAME_MODE_ON = False
-            else:
-                self.GAME_MODE_ON = True
+        action.perform(self, self.agent)
 
     def render(self) -> None:
         print('Rogue\'s Soul')

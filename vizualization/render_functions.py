@@ -58,3 +58,12 @@ def draw_entity(entities: Set[Entity], x_coord: int, y_coord: int) -> bool:
             print(entity.char, end='')
             return True
     return False
+
+def draw_game_title() -> None:
+    '''
+    Prints big game's title while launching the game.
+    '''
+
+    title = ''
+
+    print(title)

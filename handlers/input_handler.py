@@ -1,20 +1,30 @@
-from typing import Tuple, Dict as dict
+from actions.switch_mode_action import SwitchModeAction
+from typing import Optional
 
-def handle_keys(key: str) -> (dict[str, Tuple[int, int]] or dict[str, bool]):
+from actions.action import Action
+from actions.bump_action import BumpAction
+from actions.escape_action import EscapeAction
+
+def handle_keys(key: str) -> Optional[Action]:
+    action: Optional[Action] = None #Returns None if no valid key was pressed
+
     if key == '1': # LEFT
-        return {'move': (-1,0)}
+        action = BumpAction(-1, 0)
+
     elif key == '2': # UP
-        return {'move': (0,-1)}
-    elif key == '3': # RIGHT
-        return {'move': (1,0)}
-    elif key == '4': #DOWN
-        return {'move': (0,1)}
+        action = BumpAction(0, -1)
     
+    elif key == '3': # RIGHT
+        action = BumpAction(1, 0)
+    
+    elif key == '4': #DOWN
+        action = BumpAction(0, 1)
+
+    # Additional actions used only while playing the game 
     elif key == 'q' or key == 'Q': # EXIT
-        return {'exit': True}
+        action = EscapeAction()
 
-    elif key == 'm': # CHANGE MODE
-        return {'mode': True}
+    elif key == 'm' or key == 'M': # CHANGE MODE
+        action = SwitchModeAction()
 
-    else:
-        return {}
+    return action

@@ -17,7 +17,7 @@ class Map:
         self.tiles: List[Tile] = self.initialize_tiles()
         self.rooms: List[Rect] = []
 
-    def get_blocking_entity(self, x_coord: int, y_coord: int) -> Optional[Entity]:
+    def get_blocking_entity_at(self, x_coord: int, y_coord: int) -> Optional[Entity]:
         for entity in self.entities:
             if entity.blocks_movement and entity.x == x_coord and entity.y == y_coord:
                 return entity
@@ -50,3 +50,10 @@ class Map:
         for y in range(room.y1, room.y2+1):
             for x in range(room.x1, room.x2+1):
                 self.tiles[y][x].discovered = True
+            
+    def in_bounds(self, x_coord: int, y_coord: int) -> bool:
+        '''
+        Return True if x and y are inside of the bounds of this map.
+        '''
+        
+        return 0 <= x_coord < self.width and 0 <= y_coord < self.height
