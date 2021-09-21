@@ -17,9 +17,9 @@ def render_map(map: Map, game_mode_on: bool) -> None:
                     entity_drawn = draw_entity(map.entities, x, y)
                     if entity_drawn is False:
                         if map.tiles[y][x].type == TILE_TYPE.V_WALL:
-                            print("|", end="")
+                            print('|', end='')
                         elif map.tiles[y][x].type == TILE_TYPE.H_WALL:
-                            print("-", end="")
+                            print('-', end='')
                         elif map.tiles[y][x].type == TILE_TYPE.CORRIDOR:
                             print('#', end='')
                         elif map.tiles[y][x].type == TILE_TYPE.ENTRANCE:
@@ -35,9 +35,9 @@ def render_map(map: Map, game_mode_on: bool) -> None:
                     entity_drawn = draw_entity(map.entities, x, y)
                     if entity_drawn is False:
                         if map.tiles[y][x].type == TILE_TYPE.V_WALL:
-                            print("|", end="")
+                            print('|', end='')
                         elif map.tiles[y][x].type == TILE_TYPE.H_WALL:
-                            print("-", end="")
+                            print('-', end='')
                         elif map.tiles[y][x].type == TILE_TYPE.CORRIDOR:
                             print('#', end='')
                         elif map.tiles[y][x].type == TILE_TYPE.ENTRANCE:
@@ -58,12 +58,13 @@ def draw_entity(entities: Set[Entity], x_coord: int, y_coord: int) -> bool:
             return True
     return False
 
-def draw_game_title() -> None:
+def draw_game_intro() -> None:
     '''
-    Prints big game's title while launching the game.
+    Prints big game's title with the description before launching the game.
     '''
 
     title = ''
     # TODO: Add intro title showing when launching
+    # TODO: add description and some dummy input to prevent the game from further rendering
 
     print(title)

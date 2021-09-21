@@ -20,13 +20,15 @@ class EventHandler:
         key = input('Enter your choice: ')
 
         action: Optional[Action] = self.handle_keys(key)
-
+        
+        if action: # Checks if input was valid
+            action.perform()
+        
         self.engine.handle_enemy_turns()
-        action.perform()
         discover_tiles(self.engine.map, self.engine.agent) # Discovers tiles ahead of the agent
 
     def handle_keys(self, key: str) -> Optional[Action]:
-        action: Optional[Action] = None #Returns None if no valid key was pressed
+        action: Optional[Action] = None # Returns None if no valid key was pressed
 
         agent = self.engine.agent
 

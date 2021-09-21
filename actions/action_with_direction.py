@@ -25,7 +25,7 @@ class ActionWithDirection(Action):
     @property
     def blocking_entity(self) -> Optional[Entity]:
         '''
-        Return the blocking entity at this actions destination.
+        Returns the blocking entity at this actions destination.
         '''
         
         return self.engine.map.get_blocking_entity_at(*self.dest_xy)

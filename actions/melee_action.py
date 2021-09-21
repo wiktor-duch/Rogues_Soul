@@ -15,4 +15,7 @@ class MeleeAction(ActionWithDirection):
         if not target:
             return  # No entity to attack.
 
-        print(f"You attacked the {target.name} with your cursed sword!")
+        if self.entity.char == '@':
+            print(f"The agent attacked the {target.name} with their cursed sword!")
+        else:
+            print('You were attacked!')
