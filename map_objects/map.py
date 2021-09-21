@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+from entities import Actor
 from map_objects.tile import Tile
 from map_objects.rectangle import Rectangle as Rect
-from typing import Iterable, Optional, List, TYPE_CHECKING
+from typing import Iterable, Iterator, Optional, List, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from engine import Engine
@@ -19,10 +20,28 @@ class Map:
         self.tiles: List[List[Tile]] = self.initialize_tiles()
         self.rooms: List[Rect] = []
 
+    @property
+    def actors(self):
+        '''
+        Iterates over this map's actors that are still alive.
+        '''
+        yield from (
+            entity
+            for entity in self.entities
+            if isinstance(entity, Actor) and entity.is_alive
+        )
+
     def get_blocking_entity_at(self, x: int, y: int) -> Optional[Entity]:
         for entity in self.entities:
             if entity.blocks_movement and entity.x == x and entity.y == y:
                 return entity
+        
+        return None
+
+    def get_actor_at(self, x:int, y:int) -> Optional[Actor]:
+        for actor in self.actors:
+            if actor.x == x and actor.y == y:
+                return actor
         
         return None
 

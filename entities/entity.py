@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from typing import Optional, Tuple, TypeVar, TYPE_CHECKING
+from typing import Optional, TypeVar, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from map_objects import Map
@@ -20,7 +20,7 @@ class Entity:
         map: Optional[Map] = None,
         x: int = 0,
         y: int = 0,
-        char: str = '!',
+        char: str = 'U',
         name: str = '<Unnamed>',
         blocks_movement: bool = False
         ):
