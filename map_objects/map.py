@@ -3,7 +3,8 @@ from __future__ import annotations
 from entities import Actor
 from map_objects.tile import Tile
 from map_objects.rectangle import Rectangle as Rect
-from typing import Iterable, Iterator, Optional, List, TYPE_CHECKING
+
+from typing import Iterable, Optional, Tuple, List, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from engine import Engine
@@ -25,10 +26,11 @@ class Map:
         '''
         Iterates over this map's actors that are still alive.
         '''
+
         yield from (
             entity
             for entity in self.entities
-            if isinstance(entity, Actor) and entity.is_alive
+            if isinstance(entity, Actor) and entity.is_alive()
         )
 
     def get_blocking_entity_at(self, x: int, y: int) -> Optional[Entity]:
@@ -37,6 +39,33 @@ class Map:
                 return entity
         
         return None
+    
+    def is_entity_at(self, x: int, y: int) -> bool:
+        '''
+        Returns True if there is an entity at x and y.
+        '''
+        
+        for entity in self.entities:
+            if entity.x == x and entity.y == y:
+                return True
+        
+        return False
+
+    def check_for_duplicates(self, x: int, y:int) -> bool:
+        '''
+        Returns True is there are two entities at a tile with the
+        given x and y coordinates 
+        '''
+
+        list_of_entity_coordinates: List[Tuple[int]] = []
+        for entity in self.entities:
+            list_of_entity_coordinates.append((entity.x, entity.y))
+
+        num_entities = list_of_entity_coordinates.count((x, y))
+        if num_entities > 1:
+            return True
+        else:
+            return False
 
     def get_actor_at(self, x:int, y:int) -> Optional[Actor]:
         for actor in self.actors:

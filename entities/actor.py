@@ -1,5 +1,7 @@
 from __future__ import annotations
+
 from entities.entity import Entity
+from vizualization.render_order import RenderOrder
 
 from typing import Optional, Type, TYPE_CHECKING
 
@@ -18,7 +20,14 @@ class Actor(Entity):
         ai_cls: Type[BaseAI],
         fighter: Fighter
     ):
-        super().__init__(x=x, y=y, char=char, name=name, blocks_movement=True)
+        super().__init__(
+            x=x,
+            y=y,
+            char=char,
+            name=name,
+            blocks_movement=True,
+            render_order=RenderOrder.ACTOR
+        )
 
         self.ai: Optional[BaseAI] = ai_cls(self)
 
@@ -29,4 +38,8 @@ class Actor(Entity):
         '''
         Returns true as long as this entity can perform actions.
         '''
-        return bool(self.ai)
+
+        if self.fighter.hp > 0:
+            return True
+        
+        return False

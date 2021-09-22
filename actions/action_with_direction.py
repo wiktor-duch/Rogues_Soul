@@ -5,10 +5,10 @@ from actions.action import Action
 from typing import Optional, TYPE_CHECKING, Tuple
 
 if TYPE_CHECKING:
-    from entities.entity import Entity
+    from entities import Actor, Entity
 
 class ActionWithDirection(Action):
-    def __init__(self, entity: Entity, dx: int, dy: int):
+    def __init__(self, entity: Actor, dx: int, dy: int):
         super().__init__(entity)
 
         self.dx = dx
@@ -29,6 +29,14 @@ class ActionWithDirection(Action):
         '''
         
         return self.engine.map.get_blocking_entity_at(*self.dest_xy)
+    
+    @property
+    def target_actor(self):
+        '''
+        Returns the actor at this actions destination.
+        '''
+
+        return self.engine.map.get_actor_at(*self.dest_xy)
 
     def perform(self) -> None:
         '''

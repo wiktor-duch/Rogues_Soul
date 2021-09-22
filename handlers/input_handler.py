@@ -5,8 +5,33 @@ from typing import TYPE_CHECKING, Optional
 from actions import Action, BumpAction, EscapeAction, SwitchModeAction
 from vizualization import discover_tiles
 
+MOVE_KEYS ={
+    # Alphabetic keys
+    'a': (-1, 0),
+    'w': (0, -1),
+    's': (0, 1),
+    'd': (1, 0),
+
+    # Numpad keys
+    '4': (-1, 0),
+    '2': (0, -1),
+    '8': (0, 1),
+    '6': (1, 0),
+}
+
+QUIT_KEYS = {
+    'q',
+    'Q',
+}
+
+MODE_KEYS = {
+    'm',
+    'M',
+}
+
 if TYPE_CHECKING:
     from engine import Engine
+    
 class EventHandler:
     def __init__(self, engine: Engine) -> None:
         self.engine = engine
@@ -32,23 +57,15 @@ class EventHandler:
 
         agent = self.engine.agent
 
-        if key == '1': # LEFT
-            action = BumpAction(agent, -1, 0)
-
-        elif key == '2': # UP
-            action = BumpAction(agent, 0, -1)
-        
-        elif key == '3': # RIGHT
-            action = BumpAction(agent, 1, 0)
-        
-        elif key == '4': #DOWN
-            action = BumpAction(agent, 0, 1)
+        if key in MOVE_KEYS:
+            dx, dy = MOVE_KEYS[key]
+            action = BumpAction(agent, dx, dy)
 
         # Additional actions used only while playing the game 
-        elif key == 'q' or key == 'Q': # EXIT
+        elif key in QUIT_KEYS: # EXIT
             action = EscapeAction(agent)
 
-        elif key == 'm' or key == 'M': # CHANGE MODE
+        elif key in MODE_KEYS: # CHANGE MODE
             action = SwitchModeAction(agent)
 
         return action

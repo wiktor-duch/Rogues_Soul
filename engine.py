@@ -28,4 +28,5 @@ class Engine:
     def render(self) -> None:
         print('Rogue\'s Soul')
         render_map(self.map, self.game_mode_on)
+        print(f'\t\t\t\tHP: {self.agent.fighter.hp}/{self.agent.fighter.max_hp}')
         # TODO: print interface with stats

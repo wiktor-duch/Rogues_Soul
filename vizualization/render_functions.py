@@ -52,7 +52,11 @@ def draw_entity(entities: Set[Entity], x_coord: int, y_coord: int) -> bool:
     Returns true if there is one.
     '''
 
-    for entity in entities:
+    entities_sorted_for_rendering = sorted(
+        entities, key=lambda x: x.render_order.value
+    )
+
+    for entity in entities_sorted_for_rendering:
         if x_coord == entity.x and y_coord == entity.y:
             print(entity.char, end='')
             return True

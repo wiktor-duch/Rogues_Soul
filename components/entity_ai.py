@@ -53,7 +53,7 @@ class BaseAI(Action, BaseComponent):
 
         while not is_adjacent:
             # Appends a tile in x direction
-            if dist_x > dist_y:
+            if dist_x >= dist_y:
                 # Checks the direction
                 if (dest_x - curr_x) < 0: # Target is on the left
                     curr_x -= 1
@@ -66,7 +66,7 @@ class BaseAI(Action, BaseComponent):
                 dist_x = abs(dest_x - curr_x)
                 
             # Appends a tile in y direction
-            else: # dist_x <= dist_y
+            else: # dist_x < dist_y
                 # Checks the direction
                 if (dest_y - curr_y) < 0: # Target is on the left
                     curr_y -= 1

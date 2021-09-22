@@ -1,4 +1,3 @@
-print('actions called')
 from .action_with_direction import ActionWithDirection
 from .action import Action
 from .bump_action import BumpAction

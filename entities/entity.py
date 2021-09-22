@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from vizualization.render_order import RenderOrder
+
 from copy import deepcopy
 from typing import Optional, TypeVar, TYPE_CHECKING
 
@@ -22,7 +24,8 @@ class Entity:
         y: int = 0,
         char: str = 'U',
         name: str = '<Unnamed>',
-        blocks_movement: bool = False
+        blocks_movement: bool = False,
+        render_order: RenderOrder = RenderOrder.CORPSE,
         ):
 
         self.x = x
@@ -30,6 +33,7 @@ class Entity:
         self.char = char
         self.name = name
         self.blocks_movement = blocks_movement
+        self.render_order = render_order
         if map:
             # If map is not provided now, it will be set later
             self.map = map

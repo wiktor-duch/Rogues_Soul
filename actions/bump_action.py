@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 class BumpAction(ActionWithDirection):
     def perform(self) -> None:
 
-        if self.blocking_entity:
+        if self.target_actor:
             return MeleeAction(self.entity, self.dx, self.dy).perform()
 
         else:
