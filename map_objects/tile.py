@@ -14,9 +14,9 @@ class TILE_TYPE(Enum):
 
 class Tile:
     def __init__(self):
-        """
+        '''
         A tile on a map. Can block movement and sight if not discovered.
-        """
+        '''
         
         self.blocked = True
         self.discovered = False
