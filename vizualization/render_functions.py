@@ -62,13 +62,44 @@ def draw_entity(entities: Set[Entity], x_coord: int, y_coord: int) -> bool:
             return True
     return False
 
-def draw_game_intro() -> None:
+def render_game_intro() -> None:
     '''
     Prints big game's title with the description before launching the game.
     '''
 
-    title = ''
-    # TODO: Add intro title showing when launching
-    # TODO: add description and some dummy input to prevent the game from further rendering
-
+    title = ('\n\t\t╔══╗ ╔══╗ ╔══ ╔  ╗ ╔══ ║ ╔══╗\n'
+             + '\t\t╠═╦╝ ║  ║ ║ ╗ ║  ║ ╠═    ╚══╗\n'
+             + '\t\t║ ║  ╚══╝ ╚═╝ ╚══╝ ╚══   ╚══╝\n\n'
+             + '\t\t    ╔══╗ ╔══╗ ╔  ╗ ╔\n'
+             + '\t\t    ╚══╗ ║  ║ ║  ║ ║\n'
+             + '\t\t    ╚══╝ ╚══╝ ╚══╝ ╚══\n')
+    
     print(title)
+    input('Press [enter] to start.\n')
+
+def render_break_line(width: int) -> None:
+    '''
+    Prints a line of the provided width.
+    '''
+
+    if width < 1:
+        return # Invalid width provided
+    
+    for _ in range(width):
+        print('-', end='')
+
+def render_bottom_bar(
+    curr_level: int,
+    num_levels: int,
+    agent_hp: int,
+    max_hp: int,
+    souls: int,
+    ) -> None:
+    '''
+    This function renders the following game info at the bottom:
+        - Current level
+        - Agent's hp
+        - Souls collected so far
+    '''
+
+    print(f'\t\tLEVEL: {curr_level}/{num_levels}\tHP: {agent_hp}/{max_hp}\tSOULS: {souls}')

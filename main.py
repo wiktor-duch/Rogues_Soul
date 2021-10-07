@@ -2,7 +2,8 @@ from copy import deepcopy
 
 from engine import Engine
 from entities import entity_factory
-from map_objects.map_generator import generate_dungeon
+from map_objects import generate_dungeon
+from vizualization import render_game_intro
 
 '''
 Based on:
@@ -21,8 +22,12 @@ def main():
     min_rooms = 6
     max_monsters_per_room = 2
     min_monsters_per_room = 1
+    num_levels=3
     game_mode_on = True # Hides the undiscovered tiles if True
     verbose = False # Prints some additional information while game loading
+
+    render_game_intro()
+
     print('Loading Rogue\'s Soul...')
 
     # Spawns an agent
@@ -31,7 +36,10 @@ def main():
         print('Player/Agent spawned...')
 
     #Initialize engine
-    engine = Engine(agent, game_mode_on)
+    engine = Engine(agent, num_levels, game_mode_on)
+
+    # Add welcome message
+    engine.message_log.add_message('Rogue\'s Soul: Welcome to your grave and destiny my lost soul eater.')
 
     # Create map
     if verbose:
@@ -48,12 +56,15 @@ def main():
         engine)
     
     if verbose:
-        print('Dungeon generated..')
- 
+        print('Dungeon generated...\n')
+    else:
+        print('')
+    
     # Game mainloop
     while not engine.game_over:
         engine.render()
         engine.event_handler.handle_events()
+        print('\n') # Adds a line break beetween terminal outputs
 
 if __name__ == '__main__':
     main()

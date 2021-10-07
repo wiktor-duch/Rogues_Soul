@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from vizualization import RenderOrder
+from vizualization.render_order import RenderOrder
 from components.base_component import BaseComponent
 
 from typing import TYPE_CHECKING
@@ -38,11 +38,22 @@ class Fighter(BaseComponent):
             - sets the entity's name to 'Remains of {entity name}'
         '''
         if self.engine.agent is self.entity:
-            death_msg = 'You died!'
-            # self.engine.render()
+            self.engine.message_log.add_message(
+                'You died!'
+            )
+
+            '''
+            The following two lines renders the screen before agents death.
+            They should be uncommented for development process only.
+            '''
+            print('') # A simple line break in the console output
+            self.engine.render()
+
             self.engine.game_over = True
         else:
-            death_msg = f'{self.entity.name} is dead!'
+            self.engine.message_log.add_message(
+                f'{self.entity.name} is dead!'
+            )
 
         # Checks if there is no entity already at this position
         x, y = self.entity.x, self.entity.y
@@ -70,7 +81,3 @@ class Fighter(BaseComponent):
         self.entity.ai = None
         self.entity.name = f'Remains of {self.entity.name}'
         self.entity.render_order = RenderOrder.CORPSE
-        
-        print(death_msg)
-
-        

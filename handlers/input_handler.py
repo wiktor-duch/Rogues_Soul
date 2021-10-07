@@ -42,7 +42,7 @@ class EventHandler:
         '''
 
         # Input only from player. To be changed later
-        key = input('Enter your choice: ')
+        key = input('\nEnter your choice: ')
 
         action: Optional[Action] = self.handle_keys(key)
         
