@@ -21,8 +21,12 @@ class MeleeAction(ActionWithDirection):
             # Attack is successful
             target.fighter.hp -= self.entity.fighter.power
             if target.ai:
-                print(f'{self.entity.name} attacks {target.name}!')
+                self.engine.message_log.add_message(
+                    f'{self.entity.name} attacks {target.name}!'
+                )
             
         else:
             # Attack missed
-            print(f'{self.entity.name} missed the attack!')
+            self.engine.message_log.add_message(
+                f'{self.entity.name} missed the attack!'
+            )
