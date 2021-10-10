@@ -15,11 +15,11 @@ class Entity:
     A generic object to represent player, enemies, items, etc.
     '''
 
-    map: Map
+    parent: Map
 
     def __init__(
         self,
-        map: Optional[Map] = None,
+        parent: Optional[Map] = None,
         x: int = 0,
         y: int = 0,
         char: str = 'U',
@@ -34,10 +34,14 @@ class Entity:
         self.name = name
         self.blocks_movement = blocks_movement
         self.render_order = render_order
-        if map:
-            # If map is not provided now, it will be set later
-            self.map = map
-            map.entities.add(self)
+        if parent:
+            # If parent is not provided now, it will be set later
+            self.parent = parent
+            parent.entities.add(self)
+
+    @property
+    def map(self) -> Map:
+        return self.parent
 
     def spawn(self: E, map: Map, x: int, y: int) -> E:
         '''
@@ -47,7 +51,7 @@ class Entity:
         clone = deepcopy(self)
         clone.x = x
         clone.y = y
-        clone.map = map
+        clone.parent = map
         map.entities.add(clone)
         return clone
     
@@ -59,9 +63,10 @@ class Entity:
         self.x = x
         self.y = y
         if map:
-            if hasattr(self, 'map'): # Can be uninitialized
-                self.map.entities.remove(self)
-            self.map = map
+            if hasattr(self, 'parent'): # Can be uninitialized
+                if self.parent is self.map:
+                    self.map.entities.remove(self)
+            self.parent = map
             map.entities.add(self)
 
 

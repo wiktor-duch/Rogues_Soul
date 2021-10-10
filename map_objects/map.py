@@ -22,6 +22,10 @@ class Map:
         self.rooms: List[Rect] = []
 
     @property
+    def map() -> Map:
+        return self
+
+    @property
     def actors(self):
         '''
         Iterates over this map's actors that are still alive.

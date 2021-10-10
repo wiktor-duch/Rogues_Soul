@@ -32,7 +32,7 @@ class Actor(Entity):
         self.ai: Optional[BaseAI] = ai_cls(self)
 
         self.fighter = fighter
-        self.fighter.entity = self
+        self.fighter.parent = self
 
     def is_alive(self) -> bool:
         '''
