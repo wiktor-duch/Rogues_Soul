@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Optional
+import exceptions
 
 from actions import Action, BumpAction, EscapeAction, SwitchModeAction
 from vizualization import discover_tiles
@@ -36,21 +37,32 @@ class EventHandler:
     def __init__(self, engine: Engine) -> None:
         self.engine = engine
 
-    def handle_events(self) -> None:
+    def handle_events(self) -> bool:
         '''
-        Handles the keys passed by the player/AI
+        Handles the keys passed by the player/AI.
+
+        Returns True if the action will advance a turn.
         '''
 
         # Input only from player. To be changed later
         key = input('\nEnter your choice: ')
 
         action: Optional[Action] = self.handle_keys(key)
+
+        if action is None:
+            return False
         
-        if action: # Checks if input was valid
+        try:
             action.perform()
+        except exceptions.ImpossibleAction as exc:
+            self.engine.message_log.add_message(exc.args[0])
+            return False  # Skip enemy turn on exceptions.
         
         self.engine.handle_enemy_turns()
+        
         discover_tiles(self.engine.map, self.engine.agent) # Discovers tiles ahead of the agent
+        
+        return True
 
     def handle_keys(self, key: str) -> Optional[Action]:
         action: Optional[Action] = None # Returns None if no valid key was pressed

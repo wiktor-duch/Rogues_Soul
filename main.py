@@ -1,4 +1,5 @@
 from copy import deepcopy
+import traceback
 
 from engine import Engine
 from entities import entity_factory
@@ -63,7 +64,12 @@ def main():
     # Game mainloop
     while not engine.game_over:
         engine.render()
-        engine.event_handler.handle_events()
+        
+        try:
+            engine.event_handler.handle_events()
+        except Exception:
+            engine.message_log.add_message(traceback.format_exc())
+        
         print('\n') # Adds a line break beetween terminal outputs
 
 if __name__ == '__main__':

@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 from handlers import EventHandler
-from messages import MessageLog, message, message_log
+from messages import MessageLog
 from vizualization import render_map, render_break_line, render_bottom_bar
-from typing import TYPE_CHECKING, AsyncGenerator
+from typing import TYPE_CHECKING
+import exceptions
 
 if TYPE_CHECKING:
     from entities import Actor
@@ -27,7 +28,10 @@ class Engine:
     def handle_enemy_turns(self) -> None:
         for actor in set(self.map.actors) - {self.agent}:
             if actor.ai:
-                actor.ai.perform()
+                try:
+                    actor.ai.perform()
+                except exceptions.ImpossibleAction:
+                    pass # Ignore impossible action exceptions from entity AI.
     
     def render(self) -> None:
         print('Rogue\'s Soul')
