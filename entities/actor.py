@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from entities.entity import Entity
+from entities import Entity
 from vizualization.render_order import RenderOrder
 
 from typing import Optional, Type, TYPE_CHECKING

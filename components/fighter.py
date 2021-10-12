@@ -28,6 +28,27 @@ class Fighter(BaseComponent):
         if self._hp == 0 and self.parent.ai:
             self.die()
 
+    def heal(self, amount: int) -> int:
+        '''
+        Increases the parent hp by the given amount.
+        Returns the difference in hp.
+        '''
+        if self.hp == self.max_hp:
+            return 0
+        
+        new_hp = self.hp + amount
+
+        if new_hp > self.max_hp:
+            new_hp = self.max_hp
+        
+        amount_recovered = new_hp - self.hp
+        self.hp = new_hp
+
+        return amount_recovered
+    
+    def take_damage(self, amount: int) -> None:
+        self.hp -= amount
+
     def die(self) -> None:
         '''
         This method does the followig:
