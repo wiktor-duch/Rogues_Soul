@@ -1,4 +1,5 @@
 from __future__ import annotations
+from components import inventory
 
 from entities import Entity
 from vizualization.render_order import RenderOrder
@@ -6,8 +7,7 @@ from vizualization.render_order import RenderOrder
 from typing import Optional, Type, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from components.entity_ai import BaseAI
-    from components.fighter import Fighter
+    from components import BaseAI, Fighter, Inventory
 
 class Actor(Entity):
     def __init__(
@@ -18,7 +18,8 @@ class Actor(Entity):
         char: str = 'U',
         name: str = '<Unnamed>',
         ai_cls: Type[BaseAI],
-        fighter: Fighter
+        fighter: Fighter,
+        inventory: Inventory
     ):
         super().__init__(
             x=x,
@@ -29,10 +30,16 @@ class Actor(Entity):
             render_order=RenderOrder.ACTOR
         )
 
+        # Sets the AI component
         self.ai: Optional[BaseAI] = ai_cls(self)
 
+        # Sets the Fighter component
         self.fighter = fighter
         self.fighter.parent = self
+
+        # Sets the Inventory
+        self.inventory = inventory
+        self.inventory.parent = self
 
     def is_alive(self) -> bool:
         '''
