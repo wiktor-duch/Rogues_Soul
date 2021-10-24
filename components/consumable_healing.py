@@ -1,20 +1,21 @@
-from __future__ import annotations
+from actions import ItemAction
+from components.consumable import Consumable
 
-from typing import Optional, TYPE_CHECKING
-
-from actions import Action, ItemAction
-from components.base_component import BaseComponent
-
-if TYPE_CHECKING:
-    from entities import Actor, Item
-
-class ConsumableHealing(BaseComponent):
+class ConsumableHealing(Consumable):
     def __init__(self, amount: int):
         self.amount = amount
 
     def activate(self, action: ItemAction) -> None:
         consumer = action.entity
         amount_recovered = consumer.fighter.heal(self.amount)
+
+        # Remove the item
+        self.engine.map.entities.remove(self.parent)
+
+        # Move the entity
+        dx = self.parent.x - consumer.x
+        dy = self.parent.y - consumer.y
+        consumer.move(dx, dy)
 
         self.engine.message_log.add_message(
             f'Agent consumes {self.parent.name} and recover {amount_recovered} HP.'

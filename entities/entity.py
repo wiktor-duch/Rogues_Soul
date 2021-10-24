@@ -3,10 +3,11 @@ from __future__ import annotations
 from vizualization.render_order import RenderOrder
 
 from copy import deepcopy
-from typing import Optional, TypeVar, TYPE_CHECKING
+from typing import Optional, TypeVar, TYPE_CHECKING, Union
 
 if TYPE_CHECKING:
     from map_objects import Map
+    from components import Inventory
 
 E = TypeVar('E', bound='Entity')
 
@@ -15,7 +16,7 @@ class Entity:
     A generic object to represent player, enemies, items, etc.
     '''
 
-    parent: Map
+    parent: Union [Map, Inventory]
 
     def __init__(
         self,
