@@ -25,6 +25,8 @@ def main():
     min_enemies_per_room = 1
     max_health_potions_per_room = 1
     min_health_potions_per_room = 0
+    max_souls_per_room = 1
+    min_souls_per_room = 0 
     num_levels=3
     game_mode_on = True # Hides the undiscovered tiles if True
     verbose = False # Prints some additional information while game loading
@@ -56,6 +58,8 @@ def main():
         max_enemies_per_room,
         min_health_potions_per_room,
         max_health_potions_per_room,
+        min_souls_per_room,
+        max_souls_per_room,
         terminal_width, 
         terminal_height, 
         engine)

@@ -1,5 +1,6 @@
 from components import (
     ConsumableHealing,
+    ConsumableSoul,
     Fighter,
     HostileEnemy,
     Inventory
@@ -52,7 +53,13 @@ lost_knight = Actor(
 health_potion = Item(
     char='*',
     name='Health Potion',
-    consumable=ConsumableHealing(amount=6),
+    consumable=ConsumableHealing(amount=6)
+)
+
+soul = Item(
+    char='$',
+    name='Souls',
+    consumable=ConsumableSoul(amount=50)
 )
 
 # chest = Item(

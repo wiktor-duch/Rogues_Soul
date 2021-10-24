@@ -12,12 +12,6 @@ if TYPE_CHECKING:
 class Consumable(BaseComponent):
     parent: Item
 
-    def get_action(self, consumer: Actor) -> Optional[Action]:
-        '''
-        Try to return the action for this item.
-        '''
-        return ItemAction(consumer, self.parent)
-
     def activate(self, action: ItemAction) -> None:
         '''
         Invoke this items ability.

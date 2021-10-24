@@ -41,6 +41,9 @@ class Actor(Entity):
         self.inventory = inventory
         self.inventory.parent = self
 
+        # Sets souls
+        self.souls = 0
+
     def is_alive(self) -> bool:
         '''
         Returns true as long as this entity can perform actions.

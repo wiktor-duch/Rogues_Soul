@@ -52,7 +52,7 @@ class Engine:
             num_levels=self.num_levels,
             agent_hp=self.agent.fighter.hp,
             max_hp=self.agent.fighter.max_hp,
-            souls=0
+            souls=self.agent.souls
         )
 
         render_break_line(self.map.width)
