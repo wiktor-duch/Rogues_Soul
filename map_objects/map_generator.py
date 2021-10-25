@@ -10,7 +10,31 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from engine import Engine
-  
+    from entities import Item
+
+def place_item(map: Map, room: Rect, max_loops: int, item: Item, num_items_to_place: int):
+    '''
+    Randomly places the given type of items in a provided room. Number of the items
+    to be placed must also be specified.
+    '''
+    num_loops = 0
+    num_items_placed = 0
+
+    while num_items_placed < num_items_to_place:
+
+        x = randint(room.x1 + 1, room.x2 - 1)
+        y = randint(room.y1 + 1, room.y2 - 1)
+
+        if not any(entity.x == x and entity.y == y for entity in map.entities):
+            item.spawn(map, x, y)
+            num_items_placed += 1
+        
+        if num_loops > max_loops:
+            print(f'ERROR: Could not generate the minimum number of {item.name} specified!')
+            break
+
+        num_loops += 1
+
 def place_entities(
     map: Map,
     room: Rect, 
@@ -18,6 +42,8 @@ def place_entities(
     max_enemies: int,
     min_health_potions: int,
     max_health_potions: int,
+    min_chests: int,
+    max_chests:int,
     min_souls: int,
     max_souls: int
 ) -> None:
@@ -25,10 +51,9 @@ def place_entities(
     num_enemies = randint(min_enemies, max_enemies)
     num_health_potions = randint(min_health_potions, max_health_potions)
     num_souls = randint(min_souls, max_souls)
+    num_chests = randint(min_chests, max_chests)
 
     num_enemies_placed = 0
-    num_health_potions_placed = 0
-    num_souls_placed = 0
 
     num_loops = 0 # Ensures while loop breaks after a certain number of loops
     max_loops = 100
@@ -50,42 +75,36 @@ def place_entities(
             num_enemies_placed += 1
         
         if num_loops > max_loops:
-            print("ERROR: Could not generate the minimum number of health potions specified!")
+            print('ERROR: Could not generate the minimum number of health potions specified!')
             break
     
-    num_loops = 0
 
     # Place health potions
-    while num_health_potions_placed < num_health_potions:
-        num_loops += 1
-
-        x = randint(room.x1 + 1, room.x2 - 1)
-        y = randint(room.y1 + 1, room.y2 - 1)
-
-        if not any(entity.x == x and entity.y == y for entity in map.entities):
-            entity_factory.soul.spawn(map, x, y)
-            num_health_potions_placed += 1
-        
-        if num_loops > max_loops:
-            print("ERROR: Could not generate the minimum number of souls specified!")
-            break
-    
-    num_loops = 0
+    place_item(
+        map=map,
+        room=room,
+        max_loops=max_loops,
+        item=entity_factory.health_potion,
+        num_items_to_place=num_health_potions
+    )
 
     # Place souls
-    while num_souls_placed < num_souls:
-        num_loops += 1
+    place_item(
+        map=map,
+        room=room,
+        max_loops=max_loops,
+        item=entity_factory.soul,
+        num_items_to_place=num_souls
+    )
 
-        x = randint(room.x1 + 1, room.x2 - 1)
-        y = randint(room.y1 + 1, room.y2 - 1)
-
-        if not any(entity.x == x and entity.y == y for entity in map.entities):
-            entity_factory.health_potion.spawn(map, x, y)
-            num_souls_placed += 1
-        
-        if num_loops > max_loops:
-            print("ERROR: Could not generate the minimum number of enemies specified!")
-            break
+    # Place chests
+    place_item(
+        map=map,
+        room=room,
+        max_loops=max_loops,
+        item=entity_factory.chest,
+        num_items_to_place=num_chests
+    )
 
 def generate_vert_tunnel(map: Map, y1: int, y2: int, x: int) -> None:
     '''
@@ -269,7 +288,9 @@ def generate_dungeon(
     min_health_potions_per_room: int,
     max_health_potions_per_room: int,
     min_souls_per_room: int,
-    max_souls_per_room: int, 
+    max_souls_per_room: int,
+    min_chests_per_room: int,
+    max_chests_per_room: int, 
     map_width: int,
     map_height: int, 
     engine: Engine
@@ -311,7 +332,9 @@ def generate_dungeon(
                     min_health_potions=min_health_potions_per_room,
                     max_health_potions=max_health_potions_per_room,
                     min_souls=min_souls_per_room,
-                    max_souls=max_souls_per_room                    
+                    max_souls=max_souls_per_room,
+                    min_chests=min_chests_per_room,
+                    max_chests=max_chests_per_room
                 )
 
             dungeon.rooms.append(new_room)
@@ -342,7 +365,9 @@ def generate_dungeon(
                     min_health_potions=min_health_potions_per_room,
                     max_health_potions=max_health_potions_per_room,
                     min_souls=min_souls_per_room,
-                    max_souls=max_souls_per_room                    
+                    max_souls=max_souls_per_room,
+                    min_chests=min_chests_per_room,
+                    max_chests=max_chests_per_room
                 )
                 dungeon.rooms.append(new_room)
                 num_rooms += 1

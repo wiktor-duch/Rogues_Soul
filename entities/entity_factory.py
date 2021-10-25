@@ -1,5 +1,6 @@
 from components import (
     ConsumableHealing,
+    ConsumableReward,
     ConsumableSoul,
     Fighter,
     HostileEnemy,
@@ -62,8 +63,12 @@ soul = Item(
     consumable=ConsumableSoul(amount=50)
 )
 
-# chest = Item(
-#     char='?',
-#     name='Chest',
-#     consumable=None
-# )
+chest = Item(
+    char='?',
+    name='Chest',
+    consumable=ConsumableReward(
+        pct=0.5,
+        num_souls=25,
+        amount_hp=1
+    )
+)

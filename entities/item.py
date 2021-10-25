@@ -29,3 +29,4 @@ class Item(Entity):
 
         self.consumable = consumable
         self.consumable.parent = self
+        self.active = True

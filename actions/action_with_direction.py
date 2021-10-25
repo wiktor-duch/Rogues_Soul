@@ -44,7 +44,11 @@ class ActionWithDirection(Action):
         Returns the item at this action's destination.
         '''
 
-        return self.engine.map.get_item_at(*self.dest_xy)
+        if (self.engine.map.get_item_at(*self.dest_xy) is None 
+            or  self.engine.map.get_item_at(*self.dest_xy).active is False):
+            return None
+        else:
+            return self.engine.map.get_item_at(*self.dest_xy)
 
     def perform(self) -> None:
         '''

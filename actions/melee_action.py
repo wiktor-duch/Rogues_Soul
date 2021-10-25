@@ -47,7 +47,7 @@ class MeleeAction(ActionWithDirection):
         
         if damage > 0:
             # Attack successful
-            target.fighter.hp -= damage
+            target.fighter.take_damage(damage)
             if target.ai:
                 self.engine.message_log.add_message(
                     f'{self.entity.name} attacks {target.name} for {damage} HP!'
