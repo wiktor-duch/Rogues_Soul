@@ -67,7 +67,7 @@ chest = Item(
     char='?',
     name='Chest',
     consumable=ConsumableReward(
-        pct=0.5,
+        pct=0.9,
         num_souls=25,
         amount_hp=1
     )
