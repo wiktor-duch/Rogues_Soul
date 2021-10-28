@@ -10,12 +10,58 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from engine import Engine
-  
-def place_enemies(map: Map, room: Rect, min_monsters: int, max_monsters: int):
-    # Gets random number of monster in the room
-    num_monsters = randint(min_monsters, max_monsters)
+    from entities import Item
 
-    for _ in range(num_monsters):
+def place_item(map: Map, room: Rect, max_loops: int, item: Item, num_items_to_place: int):
+    '''
+    Randomly places the given type of items in a provided room. Number of the items
+    to be placed must also be specified.
+    '''
+    num_loops = 0
+    num_items_placed = 0
+
+    while num_items_placed < num_items_to_place:
+
+        x = randint(room.x1 + 1, room.x2 - 1)
+        y = randint(room.y1 + 1, room.y2 - 1)
+
+        if not any(entity.x == x and entity.y == y for entity in map.entities):
+            item.spawn(map, x, y)
+            num_items_placed += 1
+        
+        if num_loops > max_loops:
+            print(f'ERROR: Could not generate the minimum number of {item.name} specified!')
+            break
+
+        num_loops += 1
+
+def place_entities(
+    map: Map,
+    room: Rect, 
+    min_enemies: int,
+    max_enemies: int,
+    min_health_potions: int,
+    max_health_potions: int,
+    min_chests: int,
+    max_chests:int,
+    min_souls: int,
+    max_souls: int
+) -> None:
+    # Gets random number of monster in the room
+    num_enemies = randint(min_enemies, max_enemies)
+    num_health_potions = randint(min_health_potions, max_health_potions)
+    num_souls = randint(min_souls, max_souls)
+    num_chests = randint(min_chests, max_chests)
+
+    num_enemies_placed = 0
+
+    num_loops = 0 # Ensures while loop breaks after a certain number of loops
+    max_loops = 100
+
+    # Place enemies
+    while num_enemies_placed < num_enemies:
+        num_loops += 1
+
         x = randint(room.x1 + 1, room.x2 - 1)
         y = randint(room.y1 + 1, room.y2 - 1)
 
@@ -26,6 +72,39 @@ def place_enemies(map: Map, room: Rect, min_monsters: int, max_monsters: int):
             else:
                 # Place a Demon here
                 entity_factory.demon.spawn(map, x, y)
+            num_enemies_placed += 1
+        
+        if num_loops > max_loops:
+            print('ERROR: Could not generate the minimum number of health potions specified!')
+            break
+    
+
+    # Place health potions
+    place_item(
+        map=map,
+        room=room,
+        max_loops=max_loops,
+        item=entity_factory.health_potion,
+        num_items_to_place=num_health_potions
+    )
+
+    # Place souls
+    place_item(
+        map=map,
+        room=room,
+        max_loops=max_loops,
+        item=entity_factory.soul,
+        num_items_to_place=num_souls
+    )
+
+    # Place chests
+    place_item(
+        map=map,
+        room=room,
+        max_loops=max_loops,
+        item=entity_factory.chest,
+        num_items_to_place=num_chests
+    )
 
 def generate_vert_tunnel(map: Map, y1: int, y2: int, x: int) -> None:
     '''
@@ -163,7 +242,7 @@ def generate_horiz_tunnel(map: Map, x1: int, x2: int, y: int) -> None:
             map.tiles[y][x].type = TILE_TYPE.CORRIDOR
             map.tiles[y][x].blocked = False
 
-def generate_room(map: Map, room: Rect) -> None:
+def add_room_to_dungeon(map: Map, room: Rect) -> None:
     '''
     Creates a new room on the map.
     '''
@@ -180,14 +259,14 @@ def generate_room(map: Map, room: Rect) -> None:
                 map.tiles[y][x].type = TILE_TYPE.FLOOR
                 map.tiles[y][x].blocked = False
 
-def generate_new_room(
+def generate_new_rect(
     room_min_size: int,
     room_max_size: int,
     map_width: int,
     map_height: int
-    ) -> Rect:
+) -> Rect:
     '''
-    Generates random dimensions for the room and returns the new room with this dimensions
+    Generates random dimensions for the room and returns the new Rectangle with this dimensions.
     '''
 
     # Random width and height. We add 1 to account for walls
@@ -204,12 +283,18 @@ def generate_dungeon(
     max_rooms: int,
     room_min_size: int,
     room_max_size: int,
-    min_monsters_per_room: int,
-    max_monsters_per_room: int,
+    min_enemies_per_room: int,
+    max_enemies_per_room: int,
+    min_health_potions_per_room: int,
+    max_health_potions_per_room: int,
+    min_souls_per_room: int,
+    max_souls_per_room: int,
+    min_chests_per_room: int,
+    max_chests_per_room: int, 
     map_width: int,
     map_height: int, 
     engine: Engine
-    ) -> Map:
+) -> Map:
     '''
     Generates a new dungeon with random room layout.
     '''
@@ -220,7 +305,7 @@ def generate_dungeon(
     num_rooms = 0
 
     for r in range(max_rooms):
-        new_room = generate_new_room(room_min_size, room_max_size, map_width, map_height)
+        new_room = generate_new_rect(room_min_size, room_max_size, map_width, map_height)
 
         # Run through the other rooms and check if they intersect
         intersection = False
@@ -230,7 +315,7 @@ def generate_dungeon(
                 break
         if not intersection:
             # There are no intersections, so this room is valid
-            generate_room(dungeon, new_room)
+            add_room_to_dungeon(dungeon, new_room)
 
             if num_rooms == 0:
                 # Agent starts at this room
@@ -239,7 +324,18 @@ def generate_dungeon(
                 dungeon.discover_room(new_room)
             else:
                 # Add enemies
-                place_enemies(dungeon, new_room, min_monsters_per_room, max_monsters_per_room)
+                place_entities(
+                    map=dungeon,
+                    room=new_room, 
+                    min_enemies=min_enemies_per_room,
+                    max_enemies=max_enemies_per_room,
+                    min_health_potions=min_health_potions_per_room,
+                    max_health_potions=max_health_potions_per_room,
+                    min_souls=min_souls_per_room,
+                    max_souls=max_souls_per_room,
+                    min_chests=min_chests_per_room,
+                    max_chests=max_chests_per_room
+                )
 
             dungeon.rooms.append(new_room)
             num_rooms += 1
@@ -250,7 +346,7 @@ def generate_dungeon(
         while num_rooms < min_rooms:
             num_loops += 1
             
-            new_room = generate_new_room(room_min_size, room_max_size, map_width, map_height)
+            new_room = generate_new_rect(room_min_size, room_max_size, map_width, map_height)
 
             # Run through the other rooms and check if they intersect
             intersection = False
@@ -260,8 +356,19 @@ def generate_dungeon(
                     break
             if not intersection:
                 # There are no intersections, so this room is valid
-                generate_room(dungeon, new_room)
-                place_enemies(dungeon, new_room, min_monsters_per_room, max_monsters_per_room)
+                add_room_to_dungeon(dungeon, new_room)
+                place_entities(
+                    map=dungeon,
+                    room=new_room, 
+                    min_enemies=min_enemies_per_room,
+                    max_enemies=max_enemies_per_room,
+                    min_health_potions=min_health_potions_per_room,
+                    max_health_potions=max_health_potions_per_room,
+                    min_souls=min_souls_per_room,
+                    max_souls=max_souls_per_room,
+                    min_chests=min_chests_per_room,
+                    max_chests=max_chests_per_room
+                )
                 dungeon.rooms.append(new_room)
                 num_rooms += 1
             

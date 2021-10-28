@@ -33,10 +33,22 @@ class ActionWithDirection(Action):
     @property
     def target_actor(self):
         '''
-        Returns the actor at this actions destination.
+        Returns the actor at this action's destination.
         '''
 
         return self.engine.map.get_actor_at(*self.dest_xy)
+
+    @property
+    def target_item(self):
+        '''
+        Returns the item at this action's destination.
+        '''
+
+        if (self.engine.map.get_item_at(*self.dest_xy) is None 
+            or  self.engine.map.get_item_at(*self.dest_xy).active is False):
+            return None
+        else:
+            return self.engine.map.get_item_at(*self.dest_xy)
 
     def perform(self) -> None:
         '''

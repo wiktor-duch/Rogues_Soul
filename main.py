@@ -1,4 +1,5 @@
 from copy import deepcopy
+import traceback
 
 from engine import Engine
 from entities import entity_factory
@@ -20,8 +21,14 @@ def main():
     room_min_size = 4 # Should not be below 4 as otherwise it may generate errors
     max_rooms = 12
     min_rooms = 6
-    max_monsters_per_room = 2
-    min_monsters_per_room = 1
+    max_enemies_per_room = 2
+    min_enemies_per_room = 1
+    max_health_potions_per_room = 1
+    min_health_potions_per_room = 0
+    max_souls_per_room = 1
+    min_souls_per_room = 1
+    max_chests_per_room = 1
+    min_chests_per_room = 0
     num_levels=3
     game_mode_on = True # Hides the undiscovered tiles if True
     verbose = False # Prints some additional information while game loading
@@ -49,8 +56,14 @@ def main():
         max_rooms, 
         room_min_size,
         room_max_size,
-        min_monsters_per_room,
-        max_monsters_per_room,
+        min_enemies_per_room,
+        max_enemies_per_room,
+        min_health_potions_per_room,
+        max_health_potions_per_room,
+        min_souls_per_room,
+        max_souls_per_room,
+        min_chests_per_room,
+        max_chests_per_room,
         terminal_width, 
         terminal_height, 
         engine)
@@ -63,7 +76,12 @@ def main():
     # Game mainloop
     while not engine.game_over:
         engine.render()
-        engine.event_handler.handle_events()
+        
+        try:
+            engine.event_handler.handle_events()
+        except Exception:
+            engine.message_log.add_message(traceback.format_exc())
+        
         print('\n') # Adds a line break beetween terminal outputs
 
 if __name__ == '__main__':

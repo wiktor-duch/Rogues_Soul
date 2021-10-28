@@ -1,14 +1,13 @@
 from __future__ import annotations
 
 from actions import Action
-from components.base_component import BaseComponent
 
 from typing import TYPE_CHECKING, List, Tuple
 
 if TYPE_CHECKING:
     from entities import Actor
 
-class BaseAI(Action, BaseComponent):
+class BaseAI(Action):
     entity: Actor
 
     def perform(self) -> None:
