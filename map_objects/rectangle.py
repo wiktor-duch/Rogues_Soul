@@ -15,6 +15,8 @@ class Rectangle:
         self.y1 = y
         self.x2 = x + width
         self.y2 = y + height
+        self.width = width
+        self.height = height
     
     @property
     def center(self) -> Tuple[int]:

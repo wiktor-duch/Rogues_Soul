@@ -1,18 +1,26 @@
 from __future__ import annotations
 
 from entities import entity_factory
+from exceptions import InvalidMap
 from map_objects.map import Map
 from map_objects.rectangle import Rectangle as Rect
 from map_objects.tile import TILE_TYPE
 from random import randint, random
 
 from typing import TYPE_CHECKING
+import traceback
 
 if TYPE_CHECKING:
     from engine import Engine
     from entities import Item
 
-def place_item(map: Map, room: Rect, max_loops: int, item: Item, num_items_to_place: int):
+def place_item(
+    map: Map,
+    room: Rect,
+    max_loops: int,
+    item: Item,
+    num_items_to_place: int
+) -> None:
     '''
     Randomly places the given type of items in a provided room. Number of the items
     to be placed must also be specified.
@@ -30,8 +38,7 @@ def place_item(map: Map, room: Rect, max_loops: int, item: Item, num_items_to_pl
             num_items_placed += 1
         
         if num_loops > max_loops:
-            print(f'ERROR: Could not generate the minimum number of {item.name} specified!')
-            break
+            raise InvalidMap(f'ERROR: Could not generate the minimum number of {item.name} specified!')
 
         num_loops += 1
 
@@ -75,36 +82,59 @@ def place_entities(
             num_enemies_placed += 1
         
         if num_loops > max_loops:
-            print('ERROR: Could not generate the minimum number of health potions specified!')
-            break
+            raise InvalidMap('ERROR: Could not generate the minimum number of enemies specified!')
     
 
     # Place health potions
-    place_item(
-        map=map,
-        room=room,
-        max_loops=max_loops,
-        item=entity_factory.health_potion,
-        num_items_to_place=num_health_potions
-    )
+    try:
+        place_item(
+            map=map,
+            room=room,
+            max_loops=max_loops,
+            item=entity_factory.health_potion,
+            num_items_to_place=num_health_potions
+        )
+    except InvalidMap as exc:
+        raise exc
 
     # Place souls
-    place_item(
-        map=map,
-        room=room,
-        max_loops=max_loops,
-        item=entity_factory.soul,
-        num_items_to_place=num_souls
-    )
+    try:
+        place_item(
+            map=map,
+            room=room,
+            max_loops=max_loops,
+            item=entity_factory.soul,
+            num_items_to_place=num_souls
+        )
+    except InvalidMap as exc:
+        raise exc
 
     # Place chests
-    place_item(
-        map=map,
-        room=room,
-        max_loops=max_loops,
-        item=entity_factory.chest,
-        num_items_to_place=num_chests
-    )
+    try:
+        place_item(
+            map=map,
+            room=room,
+            max_loops=max_loops,
+            item=entity_factory.chest,
+            num_items_to_place=num_chests
+        )
+    except InvalidMap as exc:
+        raise exc
+
+def place_exit(map: Map) -> None:
+    # Places the exit
+    last_room = map.rooms[len(map.rooms)-1]
+    
+    for i in range(last_room.width*last_room.height):
+        exit_x = randint(last_room.x1 + 1, last_room.x2 - 1)
+        exit_y = randint(last_room.y1 + 1, last_room.y2 - 1)
+        if not any(entity.x == exit_x and entity.y == exit_y for entity in map.entities):
+            map.tiles[exit_y][exit_x].type = TILE_TYPE.EXIT
+            map.tiles[exit_y][exit_x].blocked = False
+            map.exit_location = (exit_x, exit_y)
+            break
+        if i == last_room.width*last_room.height -1:
+            raise InvalidMap('Error: Could not generate the exit.')
 
 def generate_vert_tunnel(map: Map, y1: int, y2: int, x: int) -> None:
     '''
@@ -324,18 +354,21 @@ def generate_dungeon(
                 dungeon.discover_room(new_room)
             else:
                 # Add enemies
-                place_entities(
-                    map=dungeon,
-                    room=new_room, 
-                    min_enemies=min_enemies_per_room,
-                    max_enemies=max_enemies_per_room,
-                    min_health_potions=min_health_potions_per_room,
-                    max_health_potions=max_health_potions_per_room,
-                    min_souls=min_souls_per_room,
-                    max_souls=max_souls_per_room,
-                    min_chests=min_chests_per_room,
-                    max_chests=max_chests_per_room
-                )
+                try:
+                    place_entities(
+                        map=dungeon,
+                        room=new_room, 
+                        min_enemies=min_enemies_per_room,
+                        max_enemies=max_enemies_per_room,
+                        min_health_potions=min_health_potions_per_room,
+                        max_health_potions=max_health_potions_per_room,
+                        min_souls=min_souls_per_room,
+                        max_souls=max_souls_per_room,
+                        min_chests=min_chests_per_room,
+                        max_chests=max_chests_per_room
+                    )
+                except InvalidMap as exc:
+                    raise exc
 
             dungeon.rooms.append(new_room)
             num_rooms += 1
@@ -357,25 +390,33 @@ def generate_dungeon(
             if not intersection:
                 # There are no intersections, so this room is valid
                 add_room_to_dungeon(dungeon, new_room)
-                place_entities(
-                    map=dungeon,
-                    room=new_room, 
-                    min_enemies=min_enemies_per_room,
-                    max_enemies=max_enemies_per_room,
-                    min_health_potions=min_health_potions_per_room,
-                    max_health_potions=max_health_potions_per_room,
-                    min_souls=min_souls_per_room,
-                    max_souls=max_souls_per_room,
-                    min_chests=min_chests_per_room,
-                    max_chests=max_chests_per_room
-                )
+                try:
+                    place_entities(
+                        map=dungeon,
+                        room=new_room, 
+                        min_enemies=min_enemies_per_room,
+                        max_enemies=max_enemies_per_room,
+                        min_health_potions=min_health_potions_per_room,
+                        max_health_potions=max_health_potions_per_room,
+                        min_souls=min_souls_per_room,
+                        max_souls=max_souls_per_room,
+                        min_chests=min_chests_per_room,
+                        max_chests=max_chests_per_room
+                    )
+                except InvalidMap as exc:
+                    raise exc
                 dungeon.rooms.append(new_room)
                 num_rooms += 1
             
             if num_loops > 100:
-                print("ERROR: Could not generate the minimum number of rooms specified!")
-                break
+                raise InvalidMap('ERROR: Could not generate the minimum number of rooms specified!')
     
+    # Add the exit
+    try:
+        place_exit(map=dungeon)
+    except InvalidMap as exc:
+        raise exc
+
     # Connecting all rooms
     for i in range(1, len(dungeon.rooms)):
         # Getting the center of a current room
