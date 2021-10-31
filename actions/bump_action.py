@@ -1,15 +1,20 @@
 from actions.action_with_direction import ActionWithDirection
+from actions.item_action import ItemAction
 from actions.melee_action import MeleeAction
 from actions.movement_action import MovementAction
-from actions.item_action import ItemAction
+from actions.use_exit_action import UseExitAction
+
 class BumpAction(ActionWithDirection):
     def perform(self) -> None:
 
-        if self.target_actor:
+        if self.target_actor: # There is an enemy as destination
             return MeleeAction(self.entity, self.dx, self.dy).perform()
 
-        elif self.target_item:
+        elif self.destination_is_exit: # There is an exit tile
+            return UseExitAction(self.entity).perform()
+
+        elif self.target_item: # There is an item there
             return ItemAction(self.entity, self.target_item).perform()
 
-        else:
+        else: # Try moving 
             return MovementAction(self.entity, self.dx, self.dy).perform()

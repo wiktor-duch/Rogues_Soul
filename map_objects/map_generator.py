@@ -8,7 +8,6 @@ from map_objects.tile import TILE_TYPE
 from random import randint, random
 
 from typing import TYPE_CHECKING
-import traceback
 
 if TYPE_CHECKING:
     from engine import Engine
@@ -44,6 +43,7 @@ def place_item(
 
 def place_entities(
     map: Map,
+    level: int,
     room: Rect, 
     min_enemies: int,
     max_enemies: int,
@@ -73,12 +73,21 @@ def place_entities(
         y = randint(room.y1 + 1, room.y2 - 1)
 
         if not any(entity.x == x and entity.y == y for entity in map.entities):
-            if random() < 0.8:
-                # Place a Bat here
-                entity_factory.bat.spawn(map, x, y)
-            else:
-                # Place a Demon here
-                entity_factory.demon.spawn(map, x, y)
+            if level == 2:
+                if random() < 0.7:
+                    # Places a Crow
+                    entity_factory.crow.spawn(map, x, y)
+                else:
+                    # Places a Lost Knight
+                    entity_factory.lost_knight.spawn(map, x, y)
+
+            else: # Level 1 enemies
+                if random() < 0.8:
+                    # Places a Bat
+                    entity_factory.bat.spawn(map, x, y)
+                else:
+                    # Place a Demon
+                    entity_factory.demon.spawn(map, x, y)
             num_enemies_placed += 1
         
         if num_loops > max_loops:
@@ -126,8 +135,8 @@ def place_exit(map: Map) -> None:
     last_room = map.rooms[len(map.rooms)-1]
     
     for i in range(last_room.width*last_room.height):
-        exit_x = randint(last_room.x1 + 1, last_room.x2 - 1)
-        exit_y = randint(last_room.y1 + 1, last_room.y2 - 1)
+        exit_x = randint(last_room.x1 + 2, last_room.x2 - 2)
+        exit_y = randint(last_room.y1 + 2, last_room.y2 - 2)
         if not any(entity.x == exit_x and entity.y == exit_y for entity in map.entities):
             map.tiles[exit_y][exit_x].type = TILE_TYPE.EXIT
             map.tiles[exit_y][exit_x].blocked = False
@@ -357,6 +366,7 @@ def generate_dungeon(
                 try:
                     place_entities(
                         map=dungeon,
+                        level=engine.world.current_level,
                         room=new_room, 
                         min_enemies=min_enemies_per_room,
                         max_enemies=max_enemies_per_room,
@@ -393,6 +403,7 @@ def generate_dungeon(
                 try:
                     place_entities(
                         map=dungeon,
+                        level=engine.world.current_level,
                         room=new_room, 
                         min_enemies=min_enemies_per_room,
                         max_enemies=max_enemies_per_room,

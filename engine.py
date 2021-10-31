@@ -8,23 +8,28 @@ import exceptions
 
 if TYPE_CHECKING:
     from entities import Actor
-    from map_objects import Map
+    from map_objects import Map, World
 class Engine:
     map: Map
+    world: World
 
     def __init__(self, agent: Actor, num_levels: int, game_mode_on: bool):
         '''
         Initializes the engine that handles game's logic
         '''
 
-        self.level = 1
         self.num_levels = num_levels
+        self.game_completed: bool = False
         self.agent = agent
         self.message_log = MessageLog()
         self.event_handler: EventHandler = EventHandler(self)
         self.game_mode_on = game_mode_on
         self.game_over = False
     
+    @property
+    def level(self):
+        return self.world.current_level
+
     def handle_enemy_turns(self) -> None:
         for actor in set(self.map.actors) - {self.agent}:
             if actor.ai:

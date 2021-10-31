@@ -1,13 +1,7 @@
-from __future__ import annotations
-
 from actions.action_with_direction import ActionWithDirection
 
 from random import randint
-from typing import TYPE_CHECKING
 from exceptions import ImpossibleAction
-
-if TYPE_CHECKING:
-    from entities import Entity
 
 class MeleeAction(ActionWithDirection):
     def perform_with_randomness(self) -> None:
