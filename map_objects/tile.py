@@ -11,6 +11,7 @@ class TILE_TYPE(Enum):
     H_WALL = 3
     CORRIDOR = 4
     ENTRANCE = 5
+    EXIT = 6
 
 class Tile:
     def __init__(self):

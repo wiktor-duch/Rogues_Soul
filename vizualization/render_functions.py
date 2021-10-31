@@ -1,6 +1,15 @@
 from entities import Entity
-from map_objects import Map, TILE_TYPE
+from map_objects import Map,TILE_TYPE
 from typing import Set
+
+tile_type_to_char = {
+    TILE_TYPE.V_WALL : '|',
+    TILE_TYPE.H_WALL : '-',
+    TILE_TYPE.FLOOR : '.',
+    TILE_TYPE.CORRIDOR : '#',
+    TILE_TYPE.ENTRANCE : '+',
+    TILE_TYPE.EXIT : '>'
+}
 
 def render_map(map: Map, game_mode_on: bool) -> None:
     '''
@@ -16,16 +25,7 @@ def render_map(map: Map, game_mode_on: bool) -> None:
                 else:
                     entity_drawn = draw_entity(map.entities, x, y)
                     if entity_drawn is False:
-                        if map.tiles[y][x].type == TILE_TYPE.V_WALL:
-                            print('|', end='')
-                        elif map.tiles[y][x].type == TILE_TYPE.H_WALL:
-                            print('-', end='')
-                        elif map.tiles[y][x].type == TILE_TYPE.CORRIDOR:
-                            print('#', end='')
-                        elif map.tiles[y][x].type == TILE_TYPE.ENTRANCE:
-                            print('+', end='')
-                        else:
-                            print('.', end='')
+                        print(tile_type_to_char.get(map.tiles[y][x].type), end='')
             
             # Activates development mode
             else:
@@ -34,16 +34,7 @@ def render_map(map: Map, game_mode_on: bool) -> None:
                 else:
                     entity_drawn = draw_entity(map.entities, x, y)
                     if entity_drawn is False:
-                        if map.tiles[y][x].type == TILE_TYPE.V_WALL:
-                            print('|', end='')
-                        elif map.tiles[y][x].type == TILE_TYPE.H_WALL:
-                            print('-', end='')
-                        elif map.tiles[y][x].type == TILE_TYPE.CORRIDOR:
-                            print('#', end='')
-                        elif map.tiles[y][x].type == TILE_TYPE.ENTRANCE:
-                            print('+', end='')
-                        else:
-                            print('.', end='')
+                        print(tile_type_to_char.get(map.tiles[y][x].type), end='')
         print('')
 
 def draw_entity(entities: Set[Entity], x_coord: int, y_coord: int) -> bool:

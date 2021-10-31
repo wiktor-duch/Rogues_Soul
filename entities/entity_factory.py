@@ -46,7 +46,7 @@ lost_knight = Actor(
     char='K',
     name='Knight',
     ai_cls=HostileEnemy,
-    fighter=Fighter(hp=10, defense=2, power=2),
+    fighter=Fighter(hp=8, defense=2, power=4),
     inventory=Inventory(capacity=0)
 )
 

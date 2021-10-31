@@ -19,7 +19,7 @@ class ConsumableReward(Consumable):
         if random_pct < self.percent:
             # This chest give soul
             consumer.souls += self.souls
-            self.parent.char='>'
+            self.parent.char='<'
             self.engine.message_log.add_message(
                 f'Agent opens {self.parent.name} and gets {self.souls} souls.'
             )

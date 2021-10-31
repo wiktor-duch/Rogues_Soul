@@ -4,3 +4,10 @@ class ImpossibleAction(Exception):
 
     The reason is given as the exception message.
     '''
+
+class InvalidMap(Exception):
+    '''
+    Exception raised when the map could not be generated correctly.
+
+    The reason is given as the exception message.
+    '''

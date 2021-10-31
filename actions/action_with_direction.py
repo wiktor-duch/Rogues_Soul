@@ -49,6 +49,20 @@ class ActionWithDirection(Action):
             return None
         else:
             return self.engine.map.get_item_at(*self.dest_xy)
+    
+    @property
+    def destination_is_exit(self):
+        '''
+        Returns True if the destination is the exit tile and False otherwise.
+        '''
+
+        dest_x, dest_y = self.dest_xy
+        exit_x, exit_y = self.engine.map.exit_location
+        
+        if dest_x == exit_x and dest_y == exit_y:
+            return True
+        
+        return False
 
     def perform(self) -> None:
         '''

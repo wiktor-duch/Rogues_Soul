@@ -1,13 +1,7 @@
-from __future__ import annotations
-
 from actions.action_with_direction import ActionWithDirection
 
 from random import randint
-from typing import TYPE_CHECKING
-import exceptions
-
-if TYPE_CHECKING:
-    from entities import Entity
+from exceptions import ImpossibleAction
 
 class MeleeAction(ActionWithDirection):
     def perform_with_randomness(self) -> None:
@@ -17,7 +11,7 @@ class MeleeAction(ActionWithDirection):
         target = self.target_actor
 
         if not target:
-            raise exceptions.ImpossibleAction('No target to attack.')
+            raise ImpossibleAction('No target to attack.')
 
         # Defense gives the target a chance of avoiding the attack
         if randint(0, target.fighter.defense) == 0:
@@ -41,7 +35,7 @@ class MeleeAction(ActionWithDirection):
         target = self.target_actor
 
         if not target:
-            raise exceptions.ImpossibleAction('No target to attack.')
+            raise ImpossibleAction('No target to attack.')
 
         damage = self.entity.fighter.power - target.fighter.defense
         

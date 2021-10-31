@@ -27,6 +27,7 @@ class Map:
         self.entities = set(entities)
         self.tiles: List[List[Tile]] = self.initialize_tiles()
         self.rooms: List[Rect] = []
+        self.exit_location = (-1,-1) # The default location of the exit
 
     @property
     def map(self) -> Map:
@@ -51,7 +52,6 @@ class Map:
             for entity in self.entities 
             if isinstance(entity, Item)
         )
-
 
     def get_blocking_entity_at(self, x: int, y: int) -> Optional[Entity]:
         for entity in self.entities:
