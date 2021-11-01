@@ -70,6 +70,17 @@ class Map:
                 return True
         
         return False
+    
+    def is_actor_at(self, x: int, y: int) -> bool:
+        '''
+        Returns True if there is an actor at x and y.
+        '''
+        
+        for actor in self.actors:
+            if actor.x == x and actor.y == y:
+                return True
+        
+        return False
 
     def check_for_duplicates(self, x: int, y:int) -> bool:
         '''

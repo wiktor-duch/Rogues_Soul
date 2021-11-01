@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from actions import MeleeAction, MovementAction
-from components.entity_ai import BaseAI
+from components.base_ai import BaseAI
 
 from typing import List, Tuple, TYPE_CHECKING
 
@@ -11,7 +11,6 @@ if TYPE_CHECKING:
 class HostileEnemy(BaseAI):
     def __init__(self, entity: Actor):
         super().__init__(entity)
-        self.path: List[Tuple[int]] = []
     
     def is_visible(self, target: Entity) -> bool:
         '''
@@ -38,15 +37,7 @@ class HostileEnemy(BaseAI):
                 # Target is next to the entity
                 return MeleeAction(self.entity, dx, dy).perform()
 
-            self.path = self.get_path_to(target.x, target.y)
-
-            if self.path:
-                # There is a non-empty path to the target
-                dest_x, dest_y = self.path.pop(0)
-                return MovementAction(
-                    self.entity,
-                    dest_x - self.entity.x,
-                    dest_y - self.entity.y
-                ).perform()
+            dx, dy = self.get_next_move(target.x, target.y)
+            return MovementAction(self.entity, dx, dy).perform()
         
         # Otherwise, entity does nothing
