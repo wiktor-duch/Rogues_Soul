@@ -5,13 +5,13 @@ from exceptions import InvalidMap
 from map_objects.map import Map
 from map_objects.rectangle import Rectangle as Rect
 from map_objects.tile import TILE_TYPE
-from random import randint, random
+from random import randint, choices
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Dict, List, Tuple
 
 if TYPE_CHECKING:
     from engine import Engine
-    from entities import Item
+    from entities import Item, Entity
 
 def place_item(
     map: Map,
@@ -45,19 +45,31 @@ def place_entities(
     map: Map,
     level: int,
     room: Rect, 
-    min_enemies: int,
-    max_enemies: int,
-    min_health_potions: int,
-    max_health_potions: int,
-    min_chests: int,
-    max_chests:int,
-    min_souls: int,
-    max_souls: int
+    num_enemies_per_level: List[Tuple[int, int, int]],
+    enemy_types_per_level: Dict[int, List[Tuple[Entity, int]]],
+    num_health_potions_per_level: List[Tuple[int, int, int]],
+    num_souls_per_level: List[Tuple[int, int, int]],
+    num_chests_per_level: List[Tuple[int, int, int]]
 ) -> None:
     # Gets random number of monster in the room
+    min_enemies, max_enemies = get_values_for_level(
+        num_enemies_per_level, level
+    )
     num_enemies = randint(min_enemies, max_enemies)
+    
+    min_health_potions, max_health_potions = get_values_for_level(
+        num_health_potions_per_level, level
+    )
     num_health_potions = randint(min_health_potions, max_health_potions)
+    
+    min_souls, max_souls = get_values_for_level(
+        num_souls_per_level, level
+    )
     num_souls = randint(min_souls, max_souls)
+    
+    min_chests, max_chests = get_values_for_level(
+        num_chests_per_level, level
+    )
     num_chests = randint(min_chests, max_chests)
 
     num_enemies_placed = 0
@@ -66,6 +78,13 @@ def place_entities(
     max_loops = 100
 
     # Place enemies
+    enemies, probs = get_enemy_types_and_probs(
+        enemy_types_per_level=enemy_types_per_level,
+        level=level
+    )
+    if len(enemies) == 0:
+        raise InvalidMap(f'ERROR: There are no enemy types to generate for level {level}')
+
     while num_enemies_placed < num_enemies:
         num_loops += 1
 
@@ -73,26 +92,14 @@ def place_entities(
         y = randint(room.y1 + 1, room.y2 - 1)
 
         if not any(entity.x == x and entity.y == y for entity in map.entities):
-            if level == 2:
-                if random() < 0.7:
-                    # Places a Crow
-                    entity_factory.crow.spawn(map, x, y)
-                else:
-                    # Places a Lost Knight
-                    entity_factory.lost_knight.spawn(map, x, y)
-
-            else: # Level 1 enemies
-                if random() < 0.8:
-                    # Places a Bat
-                    entity_factory.bat.spawn(map, x, y)
-                else:
-                    # Place a Demon
-                    entity_factory.demon.spawn(map, x, y)
+            enemy: Entity = choices(
+                enemies, weights=probs
+            )[0]
+            enemy.spawn(map, x, y)
             num_enemies_placed += 1
         
         if num_loops > max_loops:
             raise InvalidMap('ERROR: Could not generate the minimum number of enemies specified!')
-    
 
     # Place health potions
     try:
@@ -317,19 +324,51 @@ def generate_new_rect(
 
     return Rect(x, y, w, h)
 
+def get_values_for_level(
+    values_by_level: List[Tuple[int, int, int]],
+    level: int
+) -> Tuple[int, int]:
+    curr_min = 0
+    curr_max = 0
+
+    for level_min, min, max in values_by_level:
+        if level_min > level:
+            break
+        else:
+            curr_min = min
+            curr_max = max
+
+    return curr_min, curr_max
+
+def get_enemy_types_and_probs(
+    enemy_types_per_level: Dict[int, List[Tuple[Entity, int]]],
+    level: int
+) -> Tuple[List[Entity], List[int]]:
+    '''
+    Returns a dictionary of enemy types and the probabilities of them appearing.
+    '''
+    entities = []
+    probs = []
+
+    for key, values in enemy_types_per_level.items():
+        if key > level:
+            break
+        elif key == level:
+            for v in values:
+                entities.append(v[0])
+                probs.append(v[1])
+
+    return entities, probs
+
 def generate_dungeon(
-    min_rooms: int,
-    max_rooms: int,
     room_min_size: int,
     room_max_size: int,
-    min_enemies_per_room: int,
-    max_enemies_per_room: int,
-    min_health_potions_per_room: int,
-    max_health_potions_per_room: int,
-    min_souls_per_room: int,
-    max_souls_per_room: int,
-    min_chests_per_room: int,
-    max_chests_per_room: int, 
+    num_rooms_per_level: List[Tuple[int, int, int]],
+    num_enemies_per_level: List[Tuple[int, int, int]],
+    enemy_types_per_level: Dict[int, List[Tuple[Entity, int]]],
+    num_health_potions_per_level: List[Tuple[int, int, int]],
+    num_souls_per_level: List[Tuple[int, int, int]],
+    num_chests_per_level: List[Tuple[int, int, int]], 
     map_width: int,
     map_height: int, 
     engine: Engine
@@ -340,7 +379,9 @@ def generate_dungeon(
 
     agent = engine.agent
     dungeon = Map(engine, map_width, map_height, entities=[agent])
+    level = engine.level
 
+    min_rooms, max_rooms = get_values_for_level(num_rooms_per_level, level)
     num_rooms = 0
 
     for r in range(max_rooms):
@@ -366,16 +407,13 @@ def generate_dungeon(
                 try:
                     place_entities(
                         map=dungeon,
-                        level=engine.world.current_level,
+                        level=level,
                         room=new_room, 
-                        min_enemies=min_enemies_per_room,
-                        max_enemies=max_enemies_per_room,
-                        min_health_potions=min_health_potions_per_room,
-                        max_health_potions=max_health_potions_per_room,
-                        min_souls=min_souls_per_room,
-                        max_souls=max_souls_per_room,
-                        min_chests=min_chests_per_room,
-                        max_chests=max_chests_per_room
+                        num_enemies_per_level=num_enemies_per_level,
+                        enemy_types_per_level=enemy_types_per_level,
+                        num_health_potions_per_level=num_health_potions_per_level,
+                        num_souls_per_level=num_souls_per_level,
+                        num_chests_per_level=num_chests_per_level
                     )
                 except InvalidMap as exc:
                     raise exc
@@ -403,16 +441,13 @@ def generate_dungeon(
                 try:
                     place_entities(
                         map=dungeon,
-                        level=engine.world.current_level,
+                        level=level,
                         room=new_room, 
-                        min_enemies=min_enemies_per_room,
-                        max_enemies=max_enemies_per_room,
-                        min_health_potions=min_health_potions_per_room,
-                        max_health_potions=max_health_potions_per_room,
-                        min_souls=min_souls_per_room,
-                        max_souls=max_souls_per_room,
-                        min_chests=min_chests_per_room,
-                        max_chests=max_chests_per_room
+                        num_enemies_per_level=num_enemies_per_level,
+                        enemy_types_per_level=enemy_types_per_level,
+                        num_health_potions_per_level=num_health_potions_per_level,
+                        num_souls_per_level=num_souls_per_level,
+                        num_chests_per_level=num_chests_per_level
                     )
                 except InvalidMap as exc:
                     raise exc

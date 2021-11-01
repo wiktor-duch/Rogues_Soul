@@ -2,10 +2,11 @@ from __future__ import annotations
 
 from exceptions import InvalidMap
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Dict, List, Tuple
 
 if TYPE_CHECKING:
     from engine import Engine
+    from entities import Entity
 
 class World:
     '''
@@ -18,18 +19,14 @@ class World:
         engine: Engine,
         map_width: int,
         map_height: int,
-        min_rooms: int,
-        max_rooms: int,
         room_min_size: int,
         room_max_size: int,
-        min_enemies_per_room: int,
-        max_enemies_per_room: int,
-        min_health_potions_per_room: int,
-        max_health_potions_per_room: int,
-        min_souls_per_room: int,
-        max_souls_per_room: int,
-        min_chests_per_room: int,
-        max_chests_per_room: int,
+        num_rooms_per_level: List[Tuple[int, int, int]],
+        num_enemies_per_level: List[Tuple[int, int, int]],
+        enemy_types_per_level: Dict[int, List[Tuple[Entity, int]]],
+        num_health_potions_per_level: List[Tuple[int, int, int]],
+        num_souls_per_level: List[Tuple[int, int, int]],
+        num_chests_per_level: List[Tuple[int, int, int]], 
         current_level: int = 0
     ) -> None:
         # Engine configuration 
@@ -40,22 +37,18 @@ class World:
         self.height = map_height
 
         # Room configuration
-        self.min_rooms = min_rooms
-        self.max_rooms = max_rooms
         self.room_min_size = room_min_size
         self.room_max_size = room_max_size
+        self.num_rooms_per_level = num_rooms_per_level
 
         # Enemy configuration
-        self.min_enemies_per_room = min_enemies_per_room
-        self.max_enemies_per_room = max_enemies_per_room
+        self.num_enemies_per_level = num_enemies_per_level
+        self.enemy_types_per_level = enemy_types_per_level
 
         # Item configuration
-        self.min_health_potions_per_room = min_health_potions_per_room
-        self.max_health_potions_per_room = max_health_potions_per_room
-        self.min_souls_per_room = min_souls_per_room
-        self.max_souls_per_room = max_souls_per_room
-        self.min_chests_per_room = min_chests_per_room
-        self.max_chests_per_room = max_chests_per_room
+        self.num_health_potions_per_level = num_health_potions_per_level
+        self.num_souls_per_level = num_souls_per_level
+        self.num_chests_per_level = num_chests_per_level
 
         # Set current level
         self.current_level = current_level
@@ -67,21 +60,17 @@ class World:
 
         try:
             self.engine.map = generate_dungeon(
-                min_rooms = self.min_rooms,
-                max_rooms = self.max_rooms,
                 room_min_size = self.room_min_size,
                 room_max_size = self.room_max_size,
-                min_enemies_per_room = self.min_enemies_per_room,
-                max_enemies_per_room = self.max_enemies_per_room,
-                min_health_potions_per_room = self.min_health_potions_per_room,
-                max_health_potions_per_room = self.max_health_potions_per_room,
-                min_souls_per_room = self.min_souls_per_room,
-                max_souls_per_room = self.max_souls_per_room,
-                min_chests_per_room = self.min_chests_per_room,
-                max_chests_per_room = self.min_chests_per_room,
+                num_rooms_per_level = self.num_rooms_per_level,
+                num_enemies_per_level = self.num_enemies_per_level,
+                enemy_types_per_level=self.enemy_types_per_level,
+                num_health_potions_per_level = self.num_health_potions_per_level,
+                num_souls_per_level = self.num_souls_per_level,
+                num_chests_per_level= self.num_chests_per_level,  
                 map_width = self.width,
-                map_height = self.height,
-                engine = self.engine
+                map_height = self.height, 
+                engine=self.engine
             )
         except InvalidMap as exc:
             raise exc
