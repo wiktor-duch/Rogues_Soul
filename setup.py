@@ -2,9 +2,10 @@
 Handles initialization of game.
 '''
 from copy import deepcopy
+from typing import Dict, List, Tuple
 
 from engine import Engine
-from entities import entity_factory
+from entities import Actor, entity_factory, Equipment
 from exceptions import InvalidMap
 from map_objects import World
 from vizualization import render_game_intro
@@ -23,20 +24,54 @@ def new_engine(render_info:bool = False, verbose:bool = False) -> Engine:
     map_height = 25
     
     # Room sizes means the dimensions inside the room (NOT COUNTING WALLS)
-    room_max_size = 8
+    room_max_size = 6
     room_min_size = 4 # Should not be below 4 as otherwise it may generate errors
-    max_rooms = 12
-    min_rooms = 6
+    num_rooms_per_level: List[Tuple[int, int, int]] = [
+        # Level, Min, Max
+        (1, 5, 10),
+        (2, 7, 12)
+    ]
 
     # ENTITY CONFIGURATION
-    max_enemies_per_room = 2
-    min_enemies_per_room = 1
-    max_health_potions_per_room = 1
-    min_health_potions_per_room = 0
-    max_souls_per_room = 1
-    min_souls_per_room = 1
-    max_chests_per_room = 1
-    min_chests_per_room = 0
+    num_enemies_per_level: List[Tuple[int, int, int]] = [
+        # Level, Min, Max
+        (1, 1, 2),
+        (2, 1, 3)
+    ]
+    enemy_types_per_level: Dict[int, List[Tuple[Actor, int]]] = {
+        # Key: Level, Value: [(Entity, Percentage)...]
+        1: [(entity_factory.bat, 80), (entity_factory.demon, 20)],
+        2: [(entity_factory.crow, 70), (entity_factory.lost_knight, 30)]
+    }
+    num_health_potions_per_level: List[Tuple[int, int, int]] = [
+        # Level, Min, Max
+        (1, 0, 1)
+    ]
+    num_souls_per_level: List[Tuple[int, int, int]] = [
+        # Level, Min, Max
+        (1, 1, 1)
+    ]
+    num_chests_per_level: List[Tuple[int, int, int]] = [
+        # Level, Min, Max
+        (1, 0, 1),
+        (2, 0, 2)
+    ]
+    # Equipment configuration
+    equipment_per_level: Dict[int, List[Equipment]] = {
+        # Key: Level, Value: [Equipment, ...]
+        1: [
+            entity_factory.short_sword,
+            entity_factory.soldiers_shield,
+            entity_factory.light_chain_mail
+        ],
+        2: [
+            entity_factory.long_sword,
+            entity_factory.kite_shield,
+            entity_factory.cursed_rogues_armour
+        ]
+    }
+    # The higher, the more pieces of equipment can be placed on the map
+    spawn_equipment_prob = 0.5
 
     if render_info:
         render_game_intro()
@@ -54,21 +89,19 @@ def new_engine(render_info:bool = False, verbose:bool = False) -> Engine:
 
     # Initializes world
     engine.world = World(
-        engine = engine,
+        engine=engine,
         map_width = map_width, 
         map_height = map_height,
-        min_rooms = min_rooms, 
-        max_rooms = max_rooms, 
         room_min_size = room_min_size,
         room_max_size = room_max_size,
-        min_enemies_per_room = min_enemies_per_room,
-        max_enemies_per_room = max_enemies_per_room,
-        min_health_potions_per_room = min_health_potions_per_room,
-        max_health_potions_per_room = max_health_potions_per_room,
-        min_souls_per_room = min_souls_per_room,
-        max_souls_per_room = max_souls_per_room,
-        min_chests_per_room = min_chests_per_room,
-        max_chests_per_room = max_chests_per_room
+        num_rooms_per_level = num_rooms_per_level,
+        num_enemies_per_level = num_enemies_per_level,
+        enemy_types_per_level=enemy_types_per_level,
+        num_health_potions_per_level = num_health_potions_per_level,
+        num_souls_per_level = num_souls_per_level,
+        num_chests_per_level= num_chests_per_level,
+        spawn_equipment_prob = spawn_equipment_prob,
+        equipment_per_level = equipment_per_level
     )
     return engine
 

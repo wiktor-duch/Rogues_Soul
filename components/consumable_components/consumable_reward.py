@@ -1,5 +1,5 @@
 from actions import ItemAction
-from components.consumable import Consumable
+from components.consumable_components.consumable import Consumable
 from random import random
 
 class ConsumableReward(Consumable):

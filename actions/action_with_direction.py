@@ -5,7 +5,7 @@ from actions.action import Action
 from typing import Optional, TYPE_CHECKING, Tuple
 
 if TYPE_CHECKING:
-    from entities import Actor, Entity
+    from entities import Actor, Entity, Equipment, Item
 
 class ActionWithDirection(Action):
     def __init__(self, entity: Actor, dx: int, dy: int):
@@ -31,15 +31,22 @@ class ActionWithDirection(Action):
         return self.engine.map.get_blocking_entity_at(*self.dest_xy)
     
     @property
-    def target_actor(self):
+    def target_actor(self) -> (Actor | None):
         '''
-        Returns the actor at this action's destination.
+        Returns an actor at this action's destination.
         '''
 
         return self.engine.map.get_actor_at(*self.dest_xy)
 
     @property
-    def target_item(self):
+    def target_equipment(self) -> (Equipment | None):
+        '''
+        Returns a piece of equipment at this action's destination.
+        '''
+        return self.engine.map.get_equipment_at(*self.dest_xy)
+
+    @property
+    def target_item(self) -> (Item | None):
         '''
         Returns the item at this action's destination.
         '''
