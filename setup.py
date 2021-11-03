@@ -5,8 +5,7 @@ from copy import deepcopy
 from typing import Dict, List, Tuple
 
 from engine import Engine
-from entities import entity_factory
-from entities.entity import Entity
+from entities import Actor, entity_factory, Equipment
 from exceptions import InvalidMap
 from map_objects import World
 from vizualization import render_game_intro
@@ -39,7 +38,7 @@ def new_engine(render_info:bool = False, verbose:bool = False) -> Engine:
         (1, 1, 2),
         (2, 1, 3)
     ]
-    enemy_types_per_level: Dict[int, List[Tuple[Entity, int]]] = {
+    enemy_types_per_level: Dict[int, List[Tuple[Actor, int]]] = {
         # Key: Level, Value: [(Entity, Percentage)...]
         1: [(entity_factory.bat, 80), (entity_factory.demon, 20)],
         2: [(entity_factory.crow, 70), (entity_factory.lost_knight, 30)]
@@ -57,6 +56,22 @@ def new_engine(render_info:bool = False, verbose:bool = False) -> Engine:
         (1, 0, 1),
         (2, 0, 2)
     ]
+    # Equipment configuration
+    equipment_per_level: Dict[int, List[Equipment]] = {
+        # Key: Level, Value: [Equipment, ...]
+        1: [
+            entity_factory.short_sword,
+            entity_factory.soldiers_shield,
+            entity_factory.light_chain_mail
+        ],
+        2: [
+            entity_factory.long_sword,
+            entity_factory.kite_shield,
+            entity_factory.cursed_rogues_armour
+        ]
+    }
+    # The higher, the more pieces of equipment can be placed on the map
+    spawn_equipment_prob = 0.5
 
     if render_info:
         render_game_intro()
@@ -85,6 +100,8 @@ def new_engine(render_info:bool = False, verbose:bool = False) -> Engine:
         num_health_potions_per_level = num_health_potions_per_level,
         num_souls_per_level = num_souls_per_level,
         num_chests_per_level= num_chests_per_level,
+        spawn_equipment_prob = spawn_equipment_prob,
+        equipment_per_level = equipment_per_level
     )
     return engine
 

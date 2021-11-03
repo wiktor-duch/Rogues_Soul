@@ -1,4 +1,4 @@
-from entities import Entity
+from entities import Entity, Actor
 from map_objects import Map,TILE_TYPE
 from typing import Set
 
@@ -82,9 +82,7 @@ def render_break_line(width: int) -> None:
 def render_bottom_bar(
     curr_level: int,
     num_levels: int,
-    agent_hp: int,
-    max_hp: int,
-    souls: int,
+    agent: Actor
     ) -> None:
     '''
     This function renders the following game info at the bottom:
@@ -92,5 +90,11 @@ def render_bottom_bar(
         - Agent's hp
         - Souls collected so far
     '''
+    hp = agent.fighter.hp
+    max_hp = agent.fighter.max_hp
+    souls = agent.souls
+    defense = agent.fighter.defense
+    power = agent.fighter.power
 
-    print(f'\t\tLEVEL: {curr_level}/{num_levels}\tHP: {agent_hp}/{max_hp}\tSOULS: {souls}')
+    print(f'\t\tLEVEL: {curr_level}/{num_levels}\t  HP: {hp} \tSOULS: {souls}')
+    print(f'\t\tDEFENSE: {defense}\tMAX HP: {max_hp} \tPOWER: {power}')

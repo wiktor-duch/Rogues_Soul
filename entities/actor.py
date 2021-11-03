@@ -1,5 +1,4 @@
 from __future__ import annotations
-from components import inventory
 
 from entities import Entity
 from vizualization.render_order import RenderOrder
@@ -7,7 +6,12 @@ from vizualization.render_order import RenderOrder
 from typing import Optional, Type, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from components import BaseAI, Fighter, Inventory
+    from components import (
+        ActorsEquipment,
+        BaseAI,
+        Fighter,
+        Inventory
+    )
 
 class Actor(Entity):
     def __init__(
@@ -18,6 +22,7 @@ class Actor(Entity):
         char: str = 'U',
         name: str = '<Unnamed>',
         ai_cls: Type[BaseAI],
+        actor_equipment: ActorsEquipment,
         fighter: Fighter,
         inventory: Inventory
     ):
@@ -33,12 +38,16 @@ class Actor(Entity):
         # Sets the AI component
         self.ai: Optional[BaseAI] = ai_cls(self)
 
+        # Sets the Equipment
+        self.actor_equipment: ActorsEquipment = actor_equipment
+        self.actor_equipment.parent = self
+
         # Sets the Fighter component
-        self.fighter = fighter
+        self.fighter: Fighter = fighter
         self.fighter.parent = self
 
         # Sets the Inventory
-        self.inventory = inventory
+        self.inventory: Inventory = inventory
         self.inventory.parent = self
 
         # Sets souls

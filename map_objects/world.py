@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Dict, List, Tuple
 
 if TYPE_CHECKING:
     from engine import Engine
-    from entities import Entity
+    from entities import Entity, Equipment
 
 class World:
     '''
@@ -26,7 +26,9 @@ class World:
         enemy_types_per_level: Dict[int, List[Tuple[Entity, int]]],
         num_health_potions_per_level: List[Tuple[int, int, int]],
         num_souls_per_level: List[Tuple[int, int, int]],
-        num_chests_per_level: List[Tuple[int, int, int]], 
+        num_chests_per_level: List[Tuple[int, int, int]],
+        equipment_per_level: Dict[int, List[Equipment]],
+        spawn_equipment_prob: float,
         current_level: int = 0
     ) -> None:
         # Engine configuration 
@@ -50,6 +52,10 @@ class World:
         self.num_souls_per_level = num_souls_per_level
         self.num_chests_per_level = num_chests_per_level
 
+        # Equipment configuration
+        self.equipment_per_level = equipment_per_level
+        self.spawn_equipment_prob = spawn_equipment_prob
+
         # Set current level
         self.current_level = current_level
 
@@ -67,9 +73,11 @@ class World:
                 enemy_types_per_level=self.enemy_types_per_level,
                 num_health_potions_per_level = self.num_health_potions_per_level,
                 num_souls_per_level = self.num_souls_per_level,
-                num_chests_per_level= self.num_chests_per_level,  
+                num_chests_per_level= self.num_chests_per_level,
+                equipment_per_level = self.equipment_per_level,
+                spawn_equipment_prob = self.spawn_equipment_prob,
                 map_width = self.width,
-                map_height = self.height, 
+                map_height = self.height,
                 engine=self.engine
             )
         except InvalidMap as exc:

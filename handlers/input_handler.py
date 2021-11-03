@@ -3,7 +3,13 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Optional
 import exceptions
 
-from actions import Action, BumpAction, EscapeAction, SwitchModeAction
+from actions import (
+    Action,
+    BumpAction,
+    EscapeAction, 
+    PrintEquipmentAction,
+    SwitchModeAction
+)
 from vizualization import discover_tiles
 
 MOVE_KEYS ={
@@ -28,6 +34,11 @@ QUIT_KEYS = {
 MODE_KEYS = {
     'm',
     'M',
+}
+
+PRINT_KEY = {
+    'p',
+    'P'
 }
 
 if TYPE_CHECKING:
@@ -79,5 +90,8 @@ class EventHandler:
 
         elif key in MODE_KEYS: # CHANGE MODE
             action = SwitchModeAction(agent)
+        
+        elif key in PRINT_KEY: # PRINT EQUIPMENT
+            action = PrintEquipmentAction(agent)
 
         return action

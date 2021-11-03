@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from entities import Actor, Item
+from entities import Actor, Equipment, Item
 from map_objects.tile import Tile
 from map_objects.rectangle import Rectangle as Rect
 
@@ -53,6 +53,14 @@ class Map:
             if isinstance(entity, Item)
         )
 
+    @property
+    def equipment(self):
+        yield from (
+            entity
+            for entity in self.entities
+            if isinstance(entity, Equipment)
+        )
+
     def get_blocking_entity_at(self, x: int, y: int) -> Optional[Entity]:
         for entity in self.entities:
             if entity.blocks_movement and entity.x == x and entity.y == y:
@@ -102,6 +110,13 @@ class Map:
         for actor in self.actors:
             if actor.x == x and actor.y == y:
                 return actor
+        
+        return None
+    
+    def get_equipment_at(self, x: int, y: int) -> Optional[Equipment]:
+        for eq in self.equipment:
+            if eq.x == x and eq.y == y:
+                return eq
         
         return None
     

@@ -11,11 +11,16 @@ if TYPE_CHECKING:
 class Fighter(BaseComponent):
     parent: Actor
 
-    def __init__(self, hp: int, defense: int, power: int):
-        self.max_hp = hp # Entity’s hit points
-        self._hp = hp
-        self.defense = defense # Damage taken reduction/ chance of not being hit
-        self.power = power # Entity's raw attack power
+    def __init__(
+        self,
+        base_hp: int,
+        base_defense: int,
+        base_power: int
+    ):
+        self.base_max_hp = base_hp # Entity’s max hit points
+        self._hp = base_hp
+        self.base_defense = base_defense # Damage taken reduction/ chance of not being hit
+        self.base_power = base_power # Entity's raw attack power
 
     @property
     def hp(self) -> int:
@@ -27,6 +32,39 @@ class Fighter(BaseComponent):
         self._hp = max(0, min(value, self.max_hp))
         if self._hp == 0 and self.parent.ai:
             self.die()
+    
+    @property
+    def max_hp(self) -> int:
+        return self.base_max_hp + self.bonus_hp
+
+    @property
+    def defense(self) -> int:
+        return self.base_defense + self.bonus_defense
+
+    @property
+    def power(self) -> int:
+        return self.base_power + self.bonus_power
+
+    @property
+    def bonus_hp(self) -> int:
+        if self.parent.actor_equipment:
+            return self.parent.actor_equipment.health_bonus
+        else:
+            return 0
+
+    @property
+    def bonus_defense(self) -> int:
+        if self.parent.actor_equipment:
+            return self.parent.actor_equipment.defense_bonus
+        else:
+            return 0
+
+    @property
+    def bonus_power(self) -> int:
+        if self.parent.actor_equipment:
+            return self.parent.actor_equipment.power_bonus
+        else:
+            return 0
 
     def heal(self, amount: int) -> int:
         '''

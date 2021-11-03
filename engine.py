@@ -55,9 +55,7 @@ class Engine:
         render_bottom_bar(
             curr_level=self.level,
             num_levels=self.num_levels,
-            agent_hp=self.agent.fighter.hp,
-            max_hp=self.agent.fighter.max_hp,
-            souls=self.agent.souls
+            agent=self.agent
         )
 
         render_break_line(self.map.width)

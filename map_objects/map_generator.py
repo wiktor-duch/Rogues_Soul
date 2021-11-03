@@ -5,13 +5,13 @@ from exceptions import InvalidMap
 from map_objects.map import Map
 from map_objects.rectangle import Rectangle as Rect
 from map_objects.tile import TILE_TYPE
-from random import randint, choices
+from random import randint, choices, random, choice
 
 from typing import TYPE_CHECKING, Dict, List, Tuple
 
 if TYPE_CHECKING:
     from engine import Engine
-    from entities import Item, Entity
+    from entities import Item, Entity, Equipment
 
 def place_item(
     map: Map,
@@ -41,6 +41,51 @@ def place_item(
 
         num_loops += 1
 
+def place_equipment(
+    map: Map,
+    room: Rect,
+    max_loops: int,
+    equipment_list: List[Equipment],
+    spawn_equipment_prob: float
+) -> None:
+    '''
+    Places one piece of equipment if it is not already placed on the map.
+    '''
+    equipment_available = []
+
+    # Check for available equipment
+    if map.equipment:
+        for eq in equipment_list:
+            available = True
+            for item in map.equipment:
+                if item.equippable.equipment_type == eq.equippable.equipment_type:
+                    available = False
+            if available:
+                equipment_available.append(eq)
+    else:
+        equipment_available = equipment_list
+    
+    if len(equipment_available) > 0: # There are pieces of equipment which still can be placed
+        # Choose a random piece of equipment
+        item = choice(equipment_available)
+        
+        if random() < spawn_equipment_prob:
+            num_loops = 0
+
+            for _ in range(max_loops):
+
+                x = randint(room.x1 + 1, room.x2 - 1)
+                y = randint(room.y1 + 1, room.y2 - 1)
+
+                if not any(entity.x == x and entity.y == y for entity in map.entities):
+                    item.spawn(map, x, y)
+                    break
+                
+                if num_loops > max_loops:
+                    raise InvalidMap(f'ERROR: Could not generate the position for equipement to be placed!')
+
+                num_loops += 1
+
 def place_entities(
     map: Map,
     level: int,
@@ -49,7 +94,9 @@ def place_entities(
     enemy_types_per_level: Dict[int, List[Tuple[Entity, int]]],
     num_health_potions_per_level: List[Tuple[int, int, int]],
     num_souls_per_level: List[Tuple[int, int, int]],
-    num_chests_per_level: List[Tuple[int, int, int]]
+    num_chests_per_level: List[Tuple[int, int, int]],
+    equipment_per_level: Dict[int, List[Equipment]],
+    spawn_equipment_prob: float,
 ) -> None:
     # Gets random number of monster in the room
     min_enemies, max_enemies = get_values_for_level(
@@ -102,40 +149,44 @@ def place_entities(
             raise InvalidMap('ERROR: Could not generate the minimum number of enemies specified!')
 
     # Place health potions
-    try:
-        place_item(
-            map=map,
-            room=room,
-            max_loops=max_loops,
-            item=entity_factory.health_potion,
-            num_items_to_place=num_health_potions
-        )
-    except InvalidMap as exc:
-        raise exc
+    place_item(
+        map=map,
+        room=room,
+        max_loops=max_loops,
+        item=entity_factory.health_potion,
+        num_items_to_place=num_health_potions
+    )
 
     # Place souls
-    try:
-        place_item(
-            map=map,
-            room=room,
-            max_loops=max_loops,
-            item=entity_factory.soul,
-            num_items_to_place=num_souls
-        )
-    except InvalidMap as exc:
-        raise exc
+    place_item(
+        map=map,
+        room=room,
+        max_loops=max_loops,
+        item=entity_factory.soul,
+        num_items_to_place=num_souls
+    )
 
     # Place chests
-    try:
-        place_item(
-            map=map,
-            room=room,
-            max_loops=max_loops,
-            item=entity_factory.chest,
-            num_items_to_place=num_chests
-        )
-    except InvalidMap as exc:
-        raise exc
+    place_item(
+        map=map,
+        room=room,
+        max_loops=max_loops,
+        item=entity_factory.chest,
+        num_items_to_place=num_chests
+    )
+    
+    # Place equipment
+    equipment_list = get_equipment_for_level(
+        equipment_per_level=equipment_per_level,
+        level=level
+    )
+    place_equipment(
+        map=map,
+        room=room,
+        max_loops=max_loops,
+        equipment_list=equipment_list,
+        spawn_equipment_prob=spawn_equipment_prob
+    )
 
 def place_exit(map: Map) -> None:
     # Places the exit
@@ -340,6 +391,20 @@ def get_values_for_level(
 
     return curr_min, curr_max
 
+def get_equipment_for_level(
+    equipment_per_level: Dict[int, List[Equipment]],
+    level: int
+) -> List[Equipment]:
+    equipment = []
+
+    for key, value in equipment_per_level.items():
+        if key > level:
+            break
+        elif key == level:
+            equipment = value
+
+    return equipment
+
 def get_enemy_types_and_probs(
     enemy_types_per_level: Dict[int, List[Tuple[Entity, int]]],
     level: int
@@ -368,9 +433,11 @@ def generate_dungeon(
     enemy_types_per_level: Dict[int, List[Tuple[Entity, int]]],
     num_health_potions_per_level: List[Tuple[int, int, int]],
     num_souls_per_level: List[Tuple[int, int, int]],
-    num_chests_per_level: List[Tuple[int, int, int]], 
+    num_chests_per_level: List[Tuple[int, int, int]],
+    equipment_per_level: Dict[int, List[Equipment]],
+    spawn_equipment_prob: float,
     map_width: int,
-    map_height: int, 
+    map_height: int,
     engine: Engine
 ) -> Map:
     '''
@@ -404,19 +471,18 @@ def generate_dungeon(
                 dungeon.discover_room(new_room)
             else:
                 # Add enemies
-                try:
-                    place_entities(
-                        map=dungeon,
-                        level=level,
-                        room=new_room, 
-                        num_enemies_per_level=num_enemies_per_level,
-                        enemy_types_per_level=enemy_types_per_level,
-                        num_health_potions_per_level=num_health_potions_per_level,
-                        num_souls_per_level=num_souls_per_level,
-                        num_chests_per_level=num_chests_per_level
-                    )
-                except InvalidMap as exc:
-                    raise exc
+                place_entities(
+                    map=dungeon,
+                    level=level,
+                    room=new_room, 
+                    num_enemies_per_level=num_enemies_per_level,
+                    enemy_types_per_level=enemy_types_per_level,
+                    num_health_potions_per_level=num_health_potions_per_level,
+                    num_souls_per_level=num_souls_per_level,
+                    num_chests_per_level=num_chests_per_level,
+                    equipment_per_level=equipment_per_level,
+                    spawn_equipment_prob=spawn_equipment_prob
+                )
 
             dungeon.rooms.append(new_room)
             num_rooms += 1
@@ -438,19 +504,18 @@ def generate_dungeon(
             if not intersection:
                 # There are no intersections, so this room is valid
                 add_room_to_dungeon(dungeon, new_room)
-                try:
-                    place_entities(
-                        map=dungeon,
-                        level=level,
-                        room=new_room, 
-                        num_enemies_per_level=num_enemies_per_level,
-                        enemy_types_per_level=enemy_types_per_level,
-                        num_health_potions_per_level=num_health_potions_per_level,
-                        num_souls_per_level=num_souls_per_level,
-                        num_chests_per_level=num_chests_per_level
+                place_entities(
+                    map=dungeon,
+                    level=level,
+                    room=new_room, 
+                    num_enemies_per_level=num_enemies_per_level,
+                    enemy_types_per_level=enemy_types_per_level,
+                    num_health_potions_per_level=num_health_potions_per_level,
+                    num_souls_per_level=num_souls_per_level,
+                    num_chests_per_level=num_chests_per_level,
+                    equipment_per_level=equipment_per_level,
+                    spawn_equipment_prob=spawn_equipment_prob
                     )
-                except InvalidMap as exc:
-                    raise exc
                 dungeon.rooms.append(new_room)
                 num_rooms += 1
             
