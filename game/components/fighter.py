@@ -105,8 +105,8 @@ class Fighter(BaseComponent):
             The following two lines renders the screen before agents death.
             They should be uncommented for development process only.
             '''
-            print('') # A simple line break in the console output
-            self.engine.render()
+            # print('') # A simple line break in the console output
+            # self.engine.render()
 
             self.engine.game_over = True
         else:

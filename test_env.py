@@ -29,8 +29,26 @@ if __name__ == '__main__':
     input('Press [ENTER] to continue.')
 
     # Testing on random actions
-    print('\nVIZUALIZATION OF 10 RANDOM STEPS\n')
+    episodes = 10
+    print(f'TESTING ENV ON {episodes} EPISODES\n')
+    for e in range(1, episodes+1):
+        env.reset()
+        done = False
+        score = 0
+
+        while not done:
+            # env.render()
+            action = env.action_space.sample()
+            _, reward, done, _ = env.step(action)
+            score += reward
+        
+        print(f'Episode: {e}, Score: {score}')
+
+    input('Press [ENTER] to continue.')
+
+    # Testing on random actions (2)
     steps = 10
+    print(f'\nVIZUALIZATION OF {steps} RANDOM STEPS\n')
     state = env.reset()
     done = False
     score = 0

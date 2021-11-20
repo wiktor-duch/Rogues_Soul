@@ -6,8 +6,8 @@ from game.map_objects.map import Map
 from game.map_objects.rectangle import Rectangle as Rect
 from game.map_objects.tile import TILE_TYPE
 
-from random import randint, choices, random, choice
-from typing import TYPE_CHECKING, Dict, List, Tuple
+import random
+from typing import TYPE_CHECKING, Optional, Dict, List, Tuple
 
 if TYPE_CHECKING:
     from game.engine import Engine
@@ -29,8 +29,8 @@ def place_item(
 
     while num_items_placed < num_items_to_place:
 
-        x = randint(room.x1 + 1, room.x2 - 1)
-        y = randint(room.y1 + 1, room.y2 - 1)
+        x = random.randint(room.x1 + 1, room.x2 - 1)
+        y = random.randint(room.y1 + 1, room.y2 - 1)
 
         if not any(entity.x == x and entity.y == y for entity in map.entities):
             item.spawn(map, x, y)
@@ -67,15 +67,15 @@ def place_equipment(
     
     if len(equipment_available) > 0: # There are pieces of equipment which still can be placed
         # Choose a random piece of equipment
-        item = choice(equipment_available)
+        item = random.choice(equipment_available)
         
-        if random() < spawn_equipment_prob:
+        if random.random() < spawn_equipment_prob:
             num_loops = 0
 
             for _ in range(max_loops):
 
-                x = randint(room.x1 + 1, room.x2 - 1)
-                y = randint(room.y1 + 1, room.y2 - 1)
+                x = random.randint(room.x1 + 1, room.x2 - 1)
+                y = random.randint(room.y1 + 1, room.y2 - 1)
 
                 if not any(entity.x == x and entity.y == y for entity in map.entities):
                     item.spawn(map, x, y)
@@ -102,22 +102,22 @@ def place_entities(
     min_enemies, max_enemies = get_values_for_level(
         num_enemies_per_level, level
     )
-    num_enemies = randint(min_enemies, max_enemies)
+    num_enemies = random.randint(min_enemies, max_enemies)
     
     min_health_potions, max_health_potions = get_values_for_level(
         num_health_potions_per_level, level
     )
-    num_health_potions = randint(min_health_potions, max_health_potions)
+    num_health_potions = random.randint(min_health_potions, max_health_potions)
     
     min_souls, max_souls = get_values_for_level(
         num_souls_per_level, level
     )
-    num_souls = randint(min_souls, max_souls)
+    num_souls = random.randint(min_souls, max_souls)
     
     min_chests, max_chests = get_values_for_level(
         num_chests_per_level, level
     )
-    num_chests = randint(min_chests, max_chests)
+    num_chests = random.randint(min_chests, max_chests)
 
     num_enemies_placed = 0
 
@@ -135,11 +135,11 @@ def place_entities(
     while num_enemies_placed < num_enemies:
         num_loops += 1
 
-        x = randint(room.x1 + 1, room.x2 - 1)
-        y = randint(room.y1 + 1, room.y2 - 1)
+        x = random.randint(room.x1 + 1, room.x2 - 1)
+        y = random.randint(room.y1 + 1, room.y2 - 1)
 
         if not any(entity.x == x and entity.y == y for entity in map.entities):
-            enemy: Entity = choices(
+            enemy: Entity = random.choices(
                 enemies, weights=probs
             )[0]
             enemy.spawn(map, x, y)
@@ -193,8 +193,8 @@ def place_exit(map: Map) -> None:
     last_room = map.rooms[len(map.rooms)-1]
     
     for i in range(last_room.width*last_room.height):
-        exit_x = randint(last_room.x1 + 2, last_room.x2 - 2)
-        exit_y = randint(last_room.y1 + 2, last_room.y2 - 2)
+        exit_x = random.randint(last_room.x1 + 2, last_room.x2 - 2)
+        exit_y = random.randint(last_room.y1 + 2, last_room.y2 - 2)
         if not any(entity.x == exit_x and entity.y == exit_y for entity in map.entities):
             map.tiles[exit_y][exit_x].type = TILE_TYPE.EXIT
             map.tiles[exit_y][exit_x].blocked = False
@@ -365,13 +365,12 @@ def generate_new_rect(
     '''
     Generates random dimensions for the room and returns the new Rectangle with this dimensions.
     '''
-
     # Random width and height. We add 1 to account for walls
-    w = randint(room_min_size, room_max_size) +1
-    h = randint(room_min_size, room_max_size) +1
+    w = random.randint(room_min_size, room_max_size) +1
+    h = random.randint(room_min_size, room_max_size) +1
     # Random position without going out of the boundaries of our map
-    x = randint(1, map_width-w-1)
-    y = randint(1, map_height-h-1)
+    x = random.randint(1, map_width-w-1)
+    y = random.randint(1, map_height-h-1)
 
     return Rect(x, y, w, h)
 
@@ -447,6 +446,9 @@ def generate_dungeon(
     agent = engine.agent
     dungeon = Map(engine, map_width, map_height, entities=[agent])
     level = engine.level
+    seed = engine.seed
+    if seed != None:
+        random.seed(seed)
 
     min_rooms, max_rooms = get_values_for_level(num_rooms_per_level, level)
     num_rooms = 0
@@ -486,6 +488,10 @@ def generate_dungeon(
 
             dungeon.rooms.append(new_room)
             num_rooms += 1
+        
+        if seed != None:
+            seed += 1 # Assures to generate different room positions
+            random.seed(seed)
     
     # Last thing is to assure that we have at least min_rooms generated
     if num_rooms < min_rooms:
@@ -518,10 +524,14 @@ def generate_dungeon(
                     )
                 dungeon.rooms.append(new_room)
                 num_rooms += 1
-            
+
+            if seed != None:
+                seed += 1 # Assures to generate different room positions
+                random.seed(seed)
+
             if num_loops > 100:
                 raise InvalidMap('ERROR: Could not generate the minimum number of rooms specified!')
-    
+        
     # Add the exit
     try:
         place_exit(map=dungeon)
@@ -538,7 +548,7 @@ def generate_dungeon(
 
         # Connecting the current room to the previous one
         # Flip a coin to check if we go horziontally and then vertically or the other way 
-        if randint(0,1) == 1:
+        if random.randint(0,1) == 1:
             # First go horizontally and then vertically
             generate_horiz_tunnel(dungeon, prev_x, curr_x, prev_y)
             generate_vert_tunnel(dungeon, prev_y, curr_y, curr_x)

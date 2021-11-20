@@ -39,6 +39,12 @@ class Engine:
     def get_seed(self) -> Optional[int]:
         return self.seed
 
+    def delete_seed(self) -> None:
+        '''
+        Sets seed's value to None
+        '''
+        self.seed = None
+
     def set_game_mode(self, mode: int) -> None:
         '''
         Sets the mode of the game.

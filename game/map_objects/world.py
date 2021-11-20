@@ -63,6 +63,8 @@ class World:
         from game.map_objects import generate_dungeon
 
         self.current_level += 1
+        if self.engine.seed != None and self.current_level != 1:
+            self.engine.seed += 100
 
         try:
             self.engine.map = generate_dungeon(

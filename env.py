@@ -1,4 +1,5 @@
 import numpy as np
+from typing import Tuple
 from gym import Env
 from gym.spaces import Box, Discrete
 from typing import List, Optional
@@ -6,6 +7,8 @@ from typing import List, Optional
 import env_setup as setup
 import helper_functions as hel_fun
 from game.actions import BumpAction
+from game.vizualization import discover_tiles
+from game.map_objects.map import Map
 
 # https://github.com/kngwyu/rogue-gym/blob/master/python/rogue_gym/envs/rogue_env.py
 
@@ -21,12 +24,11 @@ class RoguesSoulsEnv(Env):
         3: (1,0) # RIGHT
     }
 
-    ACTIONS_LEN = len(MOVE_ACTIONS)
+    ACTIONS_LEN = len(MOVE_ACTIONS) 
 
     def __init__(
         self,
         max_steps: int = 2000,
-        flatten_obs: bool = True
     ) -> None:
 
         # Game settings
@@ -52,13 +54,23 @@ class RoguesSoulsEnv(Env):
             dtype=np.int16
         )
 
-        # Next Observation
-        # self.next_obs = hel_fun.get_next_observation(self.engine.map)
         # Set maximum number of steps
         self.max_steps = max_steps
         self.current_step = 0
 
-    def step(self, key: int) -> None:
+    @property
+    def unwrapped(self) -> Env:
+        return self
+
+    @property
+    def map(self) -> Map:
+        return self.engine.map
+
+    @property
+    def next_obs(self) -> List[List[int]]:
+        return hel_fun.get_next_observation(self.map)
+
+    def step(self, key: int) -> Tuple[List[List[int]], int, bool, dict]:
         # Set basic return values
         reward = 0
         done = False
@@ -78,11 +90,12 @@ class RoguesSoulsEnv(Env):
                 action = BumpAction(self.engine.agent, dx, dy)
                 action.perform()
             except:
-                pass
+                # Punish for invalid action
+                reward -= 5
 
             self.engine.handle_enemy_turns()
         
-            # discover_tiles(self.engine.map, self.engine.agent) # Discovers tiles ahead of the agent
+            discover_tiles(self.map, self.engine.agent) # Discovers tiles ahead of the agent
 
         # Calculate reward
         if self.engine.game_over is True:
@@ -146,11 +159,3 @@ class RoguesSoulsEnv(Env):
 
     def get_mode(self) -> int:
         return self.engine.game_mode
-
-    @property
-    def unwrapped(self) -> Env:
-        return self
-
-    @property
-    def next_obs(self) -> List[List[int]]:
-        return hel_fun.get_next_observation(self.engine.map)
