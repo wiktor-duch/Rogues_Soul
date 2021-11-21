@@ -85,9 +85,10 @@ if __name__ == '__main__':
     print('CHECK WITH STABLE BASELINES 3')
     keys = ['observation', 'desired_goal']
     try:
-        from gym.wrappers import FlattenObservation, FilterObservation
+        from gym.wrappers import FlattenObservation
         env = FlattenObservation(env)
         check_env(env, warn=True, skip_render_check=False)
         print('All fine!')
     except Exception as exc:
+        print('Something went wrong!')
         print(exc)

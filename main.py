@@ -1,6 +1,6 @@
 import traceback
 
-import game.setup as setup
+from game import setup
 
 '''
 Based on:

@@ -1,5 +1,7 @@
 '''
 Handles initialization of the engine for the OpenAI custom environment.
+
+This is a file that contains a setup for testing the env.
 '''
 from copy import deepcopy
 from typing import Dict, List, Tuple
