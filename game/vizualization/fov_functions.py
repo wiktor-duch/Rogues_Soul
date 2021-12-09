@@ -12,14 +12,18 @@ def get_8_nearest_tiles(map: Map, x: int, y: int)-> Tuple[Tile]:
             map.tiles[y][x+1], map.tiles[y+1][x+1],
             map.tiles[y+1][x], map.tiles[y+1][x-1])
 
-def discover_tiles(map: Map, agent: Entity) -> None:
+def discover_tiles(map: Map, agent: Entity) -> bool:
     '''
     Sets discovered to True for tiles in a given field of view radius.
     - If agent is located at the entrance tile of the room, then the 
       entire room is discovered.
     - Ig agent is located at the corridor tile, then the next 
       8 nearest tiles are discovered.
+
+    Returns True if tiles were discovered and False otherwise.
     '''
+
+    is_updated = False
     nearest_tiles = get_8_nearest_tiles(map, agent.x, agent.y)
 
     if map.tiles[agent.y][agent.x].type == TILE_TYPE.CORRIDOR:
@@ -27,6 +31,7 @@ def discover_tiles(map: Map, agent: Entity) -> None:
             if ((tile.type == TILE_TYPE.CORRIDOR or tile.type == TILE_TYPE.ENTRANCE)
                 and tile.discovered is False):
                 tile.discovered = True
+                is_updated = True
 
     elif map.tiles[agent.y][agent.x].type == TILE_TYPE.ENTRANCE:
         # Check which room agent is about to enter
@@ -36,11 +41,13 @@ def discover_tiles(map: Map, agent: Entity) -> None:
                 # If room is not discovered yet
                 if map.tiles[room_y][room_x].discovered is False:
                     map.discover_room(room)
-
+                    is_updated = True
                 # Discover all corridor tiles around the entrance
                 for tile in nearest_tiles:
                     if ((tile.type == TILE_TYPE.CORRIDOR or tile.type == TILE_TYPE.ENTRANCE)
                         and tile.discovered is False):
                         tile.discovered = True
+                        is_updated = True
                 break
+    return is_updated
 
