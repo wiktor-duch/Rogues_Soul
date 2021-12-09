@@ -83,7 +83,6 @@ if __name__ == '__main__':
 
     # Check if compatible with stable-baselines-3
     print('CHECK WITH STABLE BASELINES 3')
-    keys = ['observation', 'desired_goal']
     try:
         from gym.wrappers import FlattenObservation
         env = FlattenObservation(env)

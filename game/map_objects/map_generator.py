@@ -7,7 +7,7 @@ from game.map_objects.rectangle import Rectangle as Rect
 from game.map_objects.tile import TILE_TYPE
 
 import random
-from typing import TYPE_CHECKING, Optional, Dict, List, Tuple
+from typing import TYPE_CHECKING, Dict, List, Tuple
 
 if TYPE_CHECKING:
     from game.engine import Engine
@@ -490,7 +490,7 @@ def generate_dungeon(
             num_rooms += 1
         
         if seed != None:
-            seed += 1 # Assures to generate different room positions
+            seed += random.randint(1, 100) # Assures to generate different room positions
             random.seed(seed)
     
     # Last thing is to assure that we have at least min_rooms generated
@@ -526,7 +526,7 @@ def generate_dungeon(
                 num_rooms += 1
 
             if seed != None:
-                seed += 1 # Assures to generate different room positions
+                seed += random.randint(1, 100) # Assures to generate different room positions
                 random.seed(seed)
 
             if num_loops > 100:

@@ -2,21 +2,27 @@
 Handles initialization of the engine for the OpenAI custom environment.
 '''
 from copy import deepcopy
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 
 from game.engine import Engine
 from game.entities import Actor, entity_factory, Equipment
 from game.exceptions import InvalidMap
 from game.map_objects import World
 
-def new_engine(verbose:bool = False) -> Engine:
+def new_engine(
+    verbose: bool = False,
+    prev_mode: int = 0,
+    prev_seed: Optional[int] = None
+) -> Engine:
     '''
     Returns a new game session as an Engine instance.
+
+    Passing the previous game mode and seed is possible.
     '''
 
     # GENERAL CONFIGURATION
     num_levels = 1
-    game_mode = 0 # Hides the undiscovered tiles if 0 and shows all tiles if 1
+    game_mode = prev_mode # Hides the undiscovered tiles if 0 and shows all tiles if 1
 
     # SPACE CONFIGURATION
     map_width = 24 # (tiles)
@@ -34,7 +40,7 @@ def new_engine(verbose:bool = False) -> Engine:
     # ENTITY CONFIGURATION
     num_enemies_per_level: List[Tuple[int, int, int]] = [
         # Level, Min, Max
-        (1, 1, 2),
+        (1, 1, 1),
     ]
     enemy_types_per_level: Dict[int, List[Tuple[Actor, int]]] = {
         # Key: Level, Value: [(Entity, Percentage), ...]
@@ -72,7 +78,7 @@ def new_engine(verbose:bool = False) -> Engine:
         print('Agent spawned...')
 
     #Initializes engine
-    engine = Engine(agent, num_levels, game_mode)
+    engine = Engine(agent, num_levels, game_mode, prev_seed)
 
     # Initializes world
     engine.world = World(

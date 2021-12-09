@@ -15,7 +15,13 @@ class Engine:
     map: Map
     world: World
 
-    def __init__(self, agent: Actor, num_levels: int, game_mode: int = 0, seed: Optional[int] = None):
+    def __init__(
+        self,
+        agent: Actor,
+        num_levels: int,
+        game_mode: int = 0,
+        seed: Optional[int] = None
+    ):
         '''
         Initializes the engine that handles game's logic
         '''

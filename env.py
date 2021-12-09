@@ -1,15 +1,45 @@
 '''
+This is a simple version of a rogue-like game called 'Rogue's Soul. There is
+no shop, spells, inventory, etc. A player can only go up, down, left, right
+and whenever they 'step' on an item, they use it. To view, configure or add
+more entities view the 'entities' package and 'entity_factory.py'.
 
-To play the game yourself, launch: main.py
+The ACTION SPACE is discrete. It consists of only four actions: up, down, left,
+right.
+
+The SATE consists of a 2D array with integer values. Its shape is MAP_WIDTH x
+MAP_HEIGHT+1.The additional row at the bottom shows some statistics such as
+player's health and souls gathered. To see the meaning of each integer value,
+view the dictionaries below.
+
+The reward is 100 for escaping (using door) and -100 for losing (i.e. ding or
+exceeding step limit).Additionally, an agent gets NUM_SOULS_COLLECTED x 0.1 
+each time it picks some souls and -0.05 each time it tries invalid actions, 
+i.e. 'bumping' into a wall.
+
+The game is considered solved once the agent consistently gets 190+ points.
+This is equal to 100 for winning and 2x50 for collecting (all) souls decreased
+by some number of invalid moves.
+
+The episode finishes if an agent dies, uses the exit, or exceeds steps limit.
+
+The environment can be easily configured by changing values in the respective
+values in the env_setup.py file.
+
+Randomness in the generation process can be controlled by setting the seed.
+NOTE: Setting the seed requires calling the reset() function.
+
+To play the game yourself launch: main.py.
+
+Created by Wiktor Duch.
+Based on: http://rogueliketutorials.com/tutorials/tcod/v2/.
 '''
 
 import numpy as np
-from typing import Tuple
+from typing import Any, Tuple
 from gym import Env
 from gym.spaces import Box, Discrete
 from typing import List, Optional
-
-
 
 import env_setup as setup
 from game.actions import BumpAction
@@ -85,7 +115,6 @@ class RoguesSoulsEnv(Env):
 
         # Spaces
         self.action_space = Discrete(n=self.ACTIONS_LEN)
-        
         self.observation_space = Box(
             low=0,
             high=40,
@@ -93,8 +122,9 @@ class RoguesSoulsEnv(Env):
                 self.engine.world.height+1,
                 self.engine.world.width,
             ),
-            dtype=np.int16
+            dtype=np.int8
         )
+        self.state = self.get_next_observation()
 
         # Set maximum number of steps
         self.max_steps = max_steps
@@ -108,32 +138,36 @@ class RoguesSoulsEnv(Env):
     def map(self) -> Map:
         return self.engine.map
 
-    @property
-    def next_obs(self) -> List[List[int]]:
-        return self.get_next_observation()
-
-    def step(self, key: int) -> Tuple[List[List[int]], int, bool, dict]:
+    def step(self, key: np.int64) -> Tuple[List[List[int]], int, bool, dict]:
         # Set basic return values
         reward = 0
         done = False
-        info = {} # Placeholder for info
-
+        info = {
+            'Completed' : False,
+            'Died' : False,
+            'Souls collected': 0,
+            'Enemies killed' : 0,
+        }
+        # Update state
         self.current_step += 1
         if self.max_steps == self.current_step:
+            reward -= 100
             done = True
 
+        # Gathering statistics
         souls_before = self.engine.agent.souls
+        num_actors_before = len(list(self.map.actors))
 
         # Apply action
         if key in self.MOVE_ACTIONS:
-            info['action'] = key
             dx, dy = self.MOVE_ACTIONS[key]
             try:
                 action = BumpAction(self.engine.agent, dx, dy)
                 action.perform()
             except:
                 # Punish for invalid action
-                reward -= 5
+                # reward -= 0.05
+                pass
 
             self.engine.handle_enemy_turns()
         
@@ -142,15 +176,24 @@ class RoguesSoulsEnv(Env):
         # Calculate reward
         if self.engine.game_over is True:
             done = True # Update done
+            info['Died'] = True # Update info
             reward = -100
         elif self.engine.game_completed is True:
             done = True # Update done
+            info['Completed'] = True # Update info
             reward = 100
         else:
             souls_diff = self.engine.agent.souls - souls_before
-            reward += souls_diff
+            info['Souls collected'] += 1
+            reward += souls_diff/10
 
-        return self.next_obs, reward, done, info
+        # Check if enemies killed
+        if len(list(self.map.actors)) != num_actors_before:
+            info['Enemies killed'] += 1
+        
+        self.state = self.get_next_observation()
+
+        return self.state, reward, done, info
 
     def render(self, mode: str = 'human', close: bool = False) -> None:
         '''
@@ -159,18 +202,25 @@ class RoguesSoulsEnv(Env):
         if mode == 'human':
             return self.engine.render()
         elif mode == 'ai':
-            print(self.next_obs)
+            print(self.state)
         return
     
-    def reset(self) -> List[List[int]]:
+    def reset(self) -> Any:
         '''
         Resets the game state.
 
         Returns the initial observation.
         '''
+        # Get the previous mode
+        prev_mode = self.get_mode()
+        # Get the previous seed
+        prev_seed = self.get_seed()
 
         # Get new Engine instance
-        self.engine = setup.new_engine()
+        self.engine = setup.new_engine(
+            prev_mode=prev_mode,
+            prev_seed=prev_seed
+        )
         
         # Create new map
         is_correctly_generated = False
@@ -182,8 +232,10 @@ class RoguesSoulsEnv(Env):
         
         # Reset steps
         self.current_step = 0
+        
+        self.state = self.get_next_observation()
 
-        return self.next_obs
+        return self.state
 
     def set_seed(self, seed: int) -> None:
         '''
@@ -196,14 +248,14 @@ class RoguesSoulsEnv(Env):
     def get_seed(self) -> Optional[int]:
         return self.engine.seed
     
-    def set_game_mode(self, mode:int) -> None:
+    def set_mode(self, mode:int) -> None:
         self.engine.set_game_mode(mode)
 
     def get_mode(self) -> int:
         return self.engine.game_mode
 
     '''HELPER FUNCTIONS'''
-    def get_next_observation(self) -> List[List[int]]:
+    def get_next_observation(self) -> Any:
         obs_space = [[-1 for x in range(self.map.width)] for y in range(self.map.height+1)]
 
         for y in range(self.map.height):
@@ -242,9 +294,7 @@ class RoguesSoulsEnv(Env):
         for x in range(7, self.map.width):
             obs_space[last_y][x] = self.tile_type_to_int.get(TILE_TYPE.BACKGROUND)
 
-        obs_space = np.array(obs_space)
-
-        return obs_space   
+        return np.array(obs_space)
 
     def add_entity(self, x: int, y: int, arr: List[List[int]]) -> bool:
         '''
@@ -268,7 +318,7 @@ class RoguesSoulsEnv(Env):
                         if entity.is_alive():
                             arr[y][x] = self.enemy_to_int.get(entity.name)
                         else:
-                            arr[y][x] = self.tile_type_to_int.get(entity.name)
+                            return False
                     elif isinstance(entity, Equipment):
                         arr[y][x] = self.equipment_to_int.get(entity.name)
                     else:
