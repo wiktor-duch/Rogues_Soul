@@ -6,10 +6,13 @@ from game.components.consumable_components import (
 from game.components.equippable_components import (
     ShortSword,
     LongSword,
+    BastardSword,
     LightChainMail,
     CursedRoguesArmour,
+    DragonArmour,
     SoldiersShield,
-    KiteShield
+    KiteShield,
+    Greatshield
 )
 from game.components import (
     ActorsEquipment,
@@ -49,6 +52,15 @@ crow = Actor(
     inventory=Inventory(capacity=0)
 )
 
+rat = Actor(
+    char='r',
+    name='Rat',
+    ai_cls=HostileEnemy,
+    actor_equipment=ActorsEquipment(),
+    fighter=Fighter(base_hp=10, base_defense=0, base_power=5),
+    inventory=Inventory(capacity=0)
+)
+
 demon = Actor(
     char='D',
     name='Demon',
@@ -64,6 +76,15 @@ lost_knight = Actor(
     ai_cls=HostileEnemy,
     actor_equipment=ActorsEquipment(),
     fighter=Fighter(base_hp=8, base_defense=2, base_power=4),
+    inventory=Inventory(capacity=0)
+)
+
+skeleton = Actor(
+    char='S',
+    name='Skeleton',
+    ai_cls=HostileEnemy,
+    actor_equipment=ActorsEquipment(),
+    fighter=Fighter(base_hp=10, base_defense=3, base_power=5),
     inventory=Inventory(capacity=0)
 )
 
@@ -104,6 +125,12 @@ long_sword = Equipment(
     equippable=LongSword()
 )
 
+bastard_sword = Equipment(
+    char='/',
+    name='Bastard Sword',
+    equippable=BastardSword()
+)
+
 # Shields
 soldiers_shield = Equipment(
     char='(',
@@ -117,6 +144,12 @@ kite_shield = Equipment(
     equippable=KiteShield()
 )
 
+greatshield = Equipment(
+    char='(',
+    name='Greatshield',
+    equippable=Greatshield()
+)
+
 # Armours
 light_chain_mail = Equipment(
     char='[',
@@ -128,4 +161,10 @@ cursed_rogues_armour = Equipment(
     char='[',
     name='Cursed Rogue\'s Armour',
     equippable=CursedRoguesArmour()
+)
+
+dragon_armour = Equipment(
+    char='[',
+    name='Dragon Armour',
+    equippable=DragonArmour()
 )

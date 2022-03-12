@@ -1,5 +1,5 @@
 '''
-This is a simple version of a rogue-like game called 'Rogue's Soul. There is
+This is a simple version of a rogue-like game called 'Rogue's Soul'. There is
 no shop, spells, inventory, etc. A player can only go up, down, left, right
 and whenever they 'step' on an item, they use it. To view, configure or add
 more entities view the 'entities' package and 'entity_factory.py'.
@@ -13,18 +13,18 @@ player's health and souls gathered. To see the meaning of each integer value,
 view the dictionaries below.
 
 The reward is 100 for escaping (using door) and -100 for losing (i.e. ding or
-exceeding step limit).Additionally, an agent gets NUM_SOULS_COLLECTED x 0.1 
-each time it picks some souls and -0.05 each time it tries invalid actions, 
-i.e. 'bumping' into a wall.
+exceeding step limit).Additionally, an agent gets NUM_SOULS_COLLECTED x 1 
+each time it picks some souls, +1 every time agent discovers new corridor tile
+or room (except the starting one) and -0.1 each time timestep.
 
-The game is considered solved once the agent consistently gets 190+ points.
-This is equal to 100 for winning and 2x50 for collecting (all) souls decreased
-by some number of invalid moves.
+The game is considered solved once the agent consistently gets 70% of the
+maximum reward. This should be equal to collecting the majority of the souls
+and completing the level by escaping the dungeon.
 
 The episode finishes if an agent dies, uses the exit, or exceeds steps limit.
 
 The environment can be easily configured by changing values in the respective
-values in the env_setup.py file.
+variables in the env_setup.py file.
 
 Randomness in the generation process can be controlled by setting the seed.
 NOTE: Setting the seed requires calling the reset() function.
@@ -32,7 +32,7 @@ NOTE: Setting the seed requires calling the reset() function.
 To play the game yourself launch: main.py.
 
 Created by Wiktor Duch.
-Based on: http://rogueliketutorials.com/tutorials/tcod/v2/.
+Game based on: http://rogueliketutorials.com/tutorials/tcod/v2/.
 '''
 
 import numpy as np
@@ -63,7 +63,7 @@ class RoguesSoulsEnv(Env):
 
     # Tiles have values 0 to 9
     tile_type_to_int = {
-        TILE_TYPE.BACKGROUND: 0,
+        TILE_TYPE.BACKGROUND: -1,
         TILE_TYPE.FLOOR : 1,
         TILE_TYPE.V_WALL : 2,
         TILE_TYPE.H_WALL : 2,
@@ -75,9 +75,11 @@ class RoguesSoulsEnv(Env):
     # Enemies have values 10 to 19
     enemy_to_int = {
         'Bat' : 10,
-        'Crow' : 11,
-        'Demon' : 12,
+        'Demon' : 11,
+        'Crow' : 12,
         'Knight': 13,
+        'Rat' : 14,
+        'Skeleton' : 15,
         'Agent' : 19
     }
 
@@ -95,12 +97,15 @@ class RoguesSoulsEnv(Env):
         'Light Chain Mail' : 32,
         'Long Sword' : 33,
         'Kite Shield' : 34,
-        'Cursed Rogue\'s Armour' : 35 # Current max value
+        'Cursed Rogue\'s Armour' : 35,
+        'Bastard Sword' : 36,
+        'Greatshield' : 37,
+        'Dragon Armour' : 38 # Current max value
     }
 
     def __init__(
         self,
-        max_steps: int = 2000,
+        max_steps: int = 1000,
     ) -> None:
 
         # Game settings
@@ -140,18 +145,16 @@ class RoguesSoulsEnv(Env):
 
     def step(self, key: np.int64) -> Tuple[List[List[int]], int, bool, dict]:
         # Set basic return values
-        reward = 0
+        reward = -0.1 # Punishing wasting time and too much exploration
         done = False
         info = {
             'Completed' : False,
             'Died' : False,
-            'Souls collected': 0,
-            'Enemies killed' : 0,
         }
         # Update state
         self.current_step += 1
         if self.max_steps == self.current_step:
-            reward -= 100
+            reward = -100
             done = True
 
         # Gathering statistics
@@ -165,13 +168,13 @@ class RoguesSoulsEnv(Env):
                 action = BumpAction(self.engine.agent, dx, dy)
                 action.perform()
             except:
-                # Punish for invalid action
-                # reward -= 0.05
+                # Do nothing
                 pass
 
             self.engine.handle_enemy_turns()
         
-            discover_tiles(self.map, self.engine.agent) # Discovers tiles ahead of the agent
+            if discover_tiles(self.map, self.engine.agent): # Discovers tiles ahead of the agent
+                reward += 1 # Update reward on discovering new area
 
         # Calculate reward
         if self.engine.game_over is True:
@@ -184,12 +187,11 @@ class RoguesSoulsEnv(Env):
             reward = 100
         else:
             souls_diff = self.engine.agent.souls - souls_before
-            info['Souls collected'] += 1
-            reward += souls_diff/10
+            reward += souls_diff # Update reward based on souls found
 
         # Check if enemies killed
         if len(list(self.map.actors)) != num_actors_before:
-            info['Enemies killed'] += 1
+            pass
         
         self.state = self.get_next_observation()
 
@@ -255,6 +257,24 @@ class RoguesSoulsEnv(Env):
         return self.engine.game_mode
 
     '''HELPER FUNCTIONS'''
+    def get_valid_actions(self) -> List[int]:
+        '''
+        Returns a list of all the valid actions for the current agent's position.
+        '''
+        x = self.engine.agent.x
+        y = self.engine.agent.y
+        valid_actions: List[int] = []
+        if not self.map.tiles[y-1][x].blocked:
+            valid_actions.append(0)
+        if not self.map.tiles[y+1][x].blocked:
+            valid_actions.append(1)
+        if not self.map.tiles[y][x-1].blocked:
+            valid_actions.append(2)
+        if not self.map.tiles[y][x+1].blocked:
+            valid_actions.append(3)
+        
+        return valid_actions
+
     def get_next_observation(self) -> Any:
         obs_space = [[-1 for x in range(self.map.width)] for y in range(self.map.height+1)]
 
@@ -290,8 +310,30 @@ class RoguesSoulsEnv(Env):
         obs_space[last_y][5] = self.engine.agent.fighter.power
         # Set Defense
         obs_space[last_y][6] = self.engine.agent.fighter.defense
+        
+        # Append valid actions
+        val_acts = self.get_valid_actions()
+        if 0 in val_acts:
+            obs_space[last_y][7] = 0
+        else:
+            obs_space[last_y][7] = self.tile_type_to_int.get(TILE_TYPE.BACKGROUND)
 
-        for x in range(7, self.map.width):
+        if 1 in val_acts:
+            obs_space[last_y][8] = 1
+        else:
+            obs_space[last_y][8] = self.tile_type_to_int.get(TILE_TYPE.BACKGROUND)
+
+        if 2 in val_acts:
+            obs_space[last_y][9] = 2
+        else:
+            obs_space[last_y][9] = self.tile_type_to_int.get(TILE_TYPE.BACKGROUND)
+        
+        if 3 in val_acts:
+            obs_space[last_y][10] = 3
+        else:
+            obs_space[last_y][10] = self.tile_type_to_int.get(TILE_TYPE.BACKGROUND)
+
+        for x in range(11, self.map.width):
             obs_space[last_y][x] = self.tile_type_to_int.get(TILE_TYPE.BACKGROUND)
 
         return np.array(obs_space)

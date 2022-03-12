@@ -14,3 +14,10 @@ class CursedRoguesArmour(Equippable):
             equipment_type=EquipmentType.ARMOUR,
             health_bonus=4
         )
+
+class DragonArmour(Equippable):
+    def __init__(self) -> None:
+        super().__init__(
+            equipment_type=EquipmentType.ARMOUR,
+            health_bonus=7
+        )

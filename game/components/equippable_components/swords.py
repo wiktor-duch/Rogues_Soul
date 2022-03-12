@@ -14,3 +14,10 @@ class LongSword(Equippable):
             equipment_type=EquipmentType.SWORD,
             power_bonus=2
         )
+
+class BastardSword(Equippable):
+    def __init__(self) -> None:
+        super().__init__(
+            equipment_type=EquipmentType.SWORD,
+            power_bonus=4
+        )

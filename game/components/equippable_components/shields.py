@@ -14,3 +14,10 @@ class KiteShield(Equippable):
             equipment_type=EquipmentType.SHIELD,
             defense_bonus=2
         )
+
+class Greatshield(Equippable):
+    def __init__(self) -> None:
+        super().__init__(
+            equipment_type=EquipmentType.SHIELD,
+            defense_bonus=4
+        )
