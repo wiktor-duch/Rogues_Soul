@@ -1,3 +1,7 @@
+'''
+Inspired by:
+http://rogueliketutorials.com/tutorials/tcod/v2/
+'''
 from game.entities import Entity
 from game.map_objects import TILE_TYPE, Tile, Map
 from typing import Tuple

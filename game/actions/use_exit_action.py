@@ -1,3 +1,7 @@
+'''
+Inspired by:
+http://rogueliketutorials.com/tutorials/tcod/v2/
+'''
 from game.actions.action_with_direction import Action
 from game.exceptions import ImpossibleAction, InvalidMap
 

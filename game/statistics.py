@@ -132,7 +132,7 @@ class Statistics():
                 rms2 += ' '
             map += rms2 + '|'
         if self.max_lvl >= 3:
-            rms3 = '\n|\t   Level 3: ' + str(self.rooms_visited_lvl_3) + '/' + str(self.rooms_lvl_3) + ')'
+            rms3 = '\n|\t   Level 3: (' + str(self.rooms_visited_lvl_3) + '/' + str(self.rooms_lvl_3) + ')'
             for _ in range(35-len(rms3)):
                 rms3 += ' '
             map += rms3 + '|'
@@ -200,7 +200,7 @@ class Statistics():
             clct_1 += ' '
         eqp += clct_1 + '|'
         if self.max_lvl >= 2:
-            clct_2 = '\n|\t   Level 2: ' + str(self.rooms_visited_lvl_2)
+            clct_2 = '\n|\t   Level 2: ' + str(self.eqp_collected_lvl_2)
             for _ in range(35-len(clct_2)):
                 clct_2 += ' '
             eqp += clct_2 + '|'

@@ -1,3 +1,7 @@
+'''
+Based on:
+http://rogueliketutorials.com/tutorials/tcod/v2/
+'''
 from __future__ import annotations
 from re import S
 from game.statistics import Statistics
@@ -41,6 +45,13 @@ class Engine:
     @property
     def level(self):
         return self.world.current_level
+
+    def update_stats(self, time:int=0) -> None:
+        self.stats.time_elapsed = time
+        self.stats.hp = self.agent.fighter.max_hp
+        self.stats.defense = self.agent.fighter.defense
+        self.stats.power = self.agent.fighter.power
+        self.stats.souls = self.agent.souls
 
     def set_seed(self, seed: int) -> None:
         self.seed = seed

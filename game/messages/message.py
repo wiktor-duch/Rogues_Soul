@@ -1,3 +1,7 @@
+'''
+Based on:
+http://rogueliketutorials.com/tutorials/tcod/v2/
+'''
 class Message():
     def __init__(self, text: str):
         self.plain_text = text

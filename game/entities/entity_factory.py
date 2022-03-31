@@ -1,3 +1,7 @@
+'''
+Inspired by:
+http://rogueliketutorials.com/tutorials/tcod/v2/
+'''
 from game.components.consumable_components import (
     ConsumableHealing,
     ConsumableReward,

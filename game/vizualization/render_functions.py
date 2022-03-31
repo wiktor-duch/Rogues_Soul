@@ -1,3 +1,7 @@
+'''
+Inspired by:
+http://rogueliketutorials.com/tutorials/tcod/v2/
+'''
 from game.entities import Entity, Actor
 from game.map_objects import Map,TILE_TYPE
 

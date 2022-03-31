@@ -1,3 +1,8 @@
+'''
+Based on:
+http://rogueliketutorials.com/tutorials/tcod/v2/
+'''
+
 from __future__ import annotations
 
 from game.entities import Entity

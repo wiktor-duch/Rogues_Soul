@@ -1,3 +1,7 @@
+'''
+Adapted from:
+http://rogueliketutorials.com/tutorials/tcod/v2/
+'''
 from __future__ import annotations
 
 from game.entities import entity_factory
@@ -75,8 +79,9 @@ def place_equipment(
     if len(equipment_available) > 0: # There are pieces of equipment which still can be placed
         # Choose a random piece of equipment
         item = random.choice(equipment_available)
-        eqp_type = item.type
+        
         if random.random() < spawn_equipment_prob:
+            eqp_type = item.type
             num_loops = 0
 
             for _ in range(max_loops):
@@ -89,6 +94,7 @@ def place_equipment(
                     break
                 
                 if num_loops > max_loops:
+                    eqp_type = ''
                     raise InvalidMap(f'ERROR: Could not generate the position for equipement to be placed!')
 
                 num_loops += 1
@@ -200,6 +206,7 @@ def place_entities(
     map.engine.stats.num_enemies += num_enemies_placed
     map.engine.stats.potions_available += h_potions_placed
     map.engine.stats.num_chests += chests_placed
+    map.engine.stats.souls_available += souls_placed
     if map.engine.level == 1:
         map.engine.stats.enemies_lvl_1 += num_enemies_placed
         map.engine.stats.souls_available_lvl_1 += souls_placed

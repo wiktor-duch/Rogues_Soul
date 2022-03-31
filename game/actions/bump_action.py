@@ -1,3 +1,7 @@
+'''
+Based on:
+http://rogueliketutorials.com/tutorials/tcod/v2/
+'''
 from game.actions.action_with_direction import ActionWithDirection
 from game.actions.equip_action import EquipAction
 from game.actions.item_action import ItemAction

@@ -1,3 +1,7 @@
+'''
+Based on:
+http://rogueliketutorials.com/tutorials/tcod/v2/
+'''
 from game.actions.action_with_direction import ActionWithDirection
 from game.exceptions import ImpossibleAction
 

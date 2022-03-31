@@ -1,3 +1,7 @@
+'''
+Inspired by:
+http://rogueliketutorials.com/tutorials/tcod/v2/
+'''
 from game.components.equippable_components.equippable import Equippable
 from game.components.equippable_components.equipment_types import EquipmentType
 

@@ -1,3 +1,7 @@
+'''
+Adapted from:
+http://rogueliketutorials.com/tutorials/tcod/v2/
+'''
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Optional
@@ -77,11 +81,11 @@ class EventHandler:
         if room_updated:
             self.engine.stats.fov_updates += 1
             self.engine.stats.rooms_visted += 1
-            if self.engine.num_levels == 1:
+            if self.engine.level == 1:
                 self.engine.stats.rooms_visited_lvl_1 += 1
-            elif self.engine.num_levels == 2:
+            elif self.engine.level == 2:
                 self.engine.stats.rooms_visited_lvl_2 += 1
-            elif self.engine.num_levels == 3:
+            elif self.engine.level == 3:
                 self.engine.stats.rooms_visited_lvl_3 += 1
         elif corr_updated:
             self.engine.stats.fov_updates += 1
@@ -99,12 +103,13 @@ class EventHandler:
             action = BumpAction(agent, dx, dy)
             self.engine.stats.valid_actions += 1
 
-        # Additional actions used only while playing the game 
+        # Additional actions used only while playing the game
         elif key in QUIT_KEYS: # EXIT
             action = EscapeAction(agent)
 
-        elif key in MODE_KEYS: # CHANGE MODE
-            action = SwitchModeAction(agent)
+        # Comment out to enable mode switching 
+        # elif key in MODE_KEYS: # CHANGE MODE
+        #     action = SwitchModeAction(agent)
         
         elif key in PRINT_KEY: # PRINT EQUIPMENT
             action = PrintEquipmentAction(agent)

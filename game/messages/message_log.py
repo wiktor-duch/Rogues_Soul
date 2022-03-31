@@ -1,3 +1,7 @@
+'''
+Adapted from:
+http://rogueliketutorials.com/tutorials/tcod/v2/
+'''
 from game.messages.message import Message
 
 class MessageLog():

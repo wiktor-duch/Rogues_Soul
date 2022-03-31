@@ -1,3 +1,7 @@
+'''
+Based on:
+http://rogueliketutorials.com/tutorials/tcod/v2/
+'''
 from enum import Enum
 
 class TILE_TYPE(Enum):
