@@ -72,6 +72,7 @@ if __name__ == '__main__':
     print('Human sees as follows.')
     env.reset()
     env.set_mode(1)
+    env.reset()
     env.render(mode='human')
 
     input('Press [ENTER] to continue.')

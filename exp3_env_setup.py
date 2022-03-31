@@ -22,7 +22,7 @@ def new_engine(
 
     # GENERAL CONFIGURATION
     num_levels = 3
-    game_mode = 0 # Hides the undiscovered tiles if 0 and shows all tiles if 1
+    game_mode = prev_mode # Hides the undiscovered tiles if 0 and shows all til
 
     # SPACE CONFIGURATION
     map_width = 50  # (tiles)

@@ -35,12 +35,12 @@ Created by Wiktor Duch.
 Game based on: http://rogueliketutorials.com/tutorials/tcod/v2/.
 '''
 
-from xmlrpc.client import boolean
 import numpy as np
 from typing import Any, Tuple
 from gym import Env
 from gym.spaces import Box, Discrete
 from typing import List, Optional
+import random
 
 import exp3_env_setup as setup
 from game.actions import BumpAction
@@ -136,6 +136,13 @@ class RoguesSoulsEnv(Env):
         self.max_steps = max_steps
         self.current_step = 0
 
+        # Randomness testing
+        self.entry_in_set: int = -1
+        self.test: bool = False
+        self.eval: bool = False
+        self.test_set: List[int] = list()
+        self.eval_set: List[int] = list()
+
     @property
     def unwrapped(self) -> Env:
         return self
@@ -144,7 +151,7 @@ class RoguesSoulsEnv(Env):
     def map(self) -> Map:
         return self.engine.map
 
-    def step(self, key: np.int64, print_stats:boolean = True) -> Tuple[List[List[int]], int, bool, dict]:
+    def step(self, key: np.int64, print_stats:bool = True) -> Tuple[List[List[int]], int, bool, dict]:
         # Set basic return values
         # reward = -0.1 # Punishing wasting time and too much exploration
         reward = 0
@@ -237,15 +244,20 @@ class RoguesSoulsEnv(Env):
 
         Returns the initial observation.
         '''
-        # Get the previous mode
-        prev_mode = self.get_mode()
         # Get the previous seed
-        prev_seed = self.get_seed()
+        if len(self.test_set) == 0 and len(self.eval_set) == 0:
+            seed = self.get_seed()
+        else: # Get next seed in the test or eval set
+            self.entry_in_set += 1
+            if self.test:
+                seed = self.test_set[self.entry_in_set % len(self.test_set)]
+            elif self.eval:
+                seed = self.eval_set[self.entry_in_set % len(self.eval_set)]
 
         # Get new Engine instance
         self.engine = setup.new_engine(
-            prev_mode=prev_mode,
-            prev_seed=prev_seed
+            prev_mode=self.get_mode(),
+            prev_seed=seed
         )
         
         # Create new map
@@ -263,8 +275,33 @@ class RoguesSoulsEnv(Env):
 
         return self.state
 
-    def set_test_and_eval_sets(self, test_size:int, eval_size:int):
-        pass
+    def change_set(self, mode:int) -> None:
+        '''
+        Toggles between evaluation and test seed sets.
+        0: test
+        else: evaluation
+        '''
+        if mode == 0:
+            self.test = True
+            self.eval = False
+        else:
+            self.test = False
+            self.eval = True
+        self.entry_in_set = -1
+        self.reset()
+
+    def set_test_and_eval_sets(self, test_size:int, eval_size:int) -> None:
+        self.test = True
+        for _ in range(test_size):
+            self.test_set.append(random.randint(1, test_size*100))
+        for _ in range(eval_size):
+            self.eval_set.append(random.randint(test_size*100+1, (test_size+eval_size)*100))
+
+    def get_test_set(self) -> List[int]:
+        return self.test_set
+    
+    def get_eval_set(self) -> List[int]:
+        return self.eval_set
 
     def set_seed(self, seed: int) -> None:
         '''
@@ -273,12 +310,19 @@ class RoguesSoulsEnv(Env):
         - seed(int): seed value for RNG
         '''
         self.engine.set_seed(seed)
+        self.reset()
 
     def get_seed(self) -> Optional[int]:
         return self.engine.seed
     
     def set_mode(self, mode:int) -> None:
+        '''
+        Sets modes:
+        0: Game mode
+        1: Developer mode
+        '''
         self.engine.set_game_mode(mode)
+        self.reset()
 
     def get_mode(self) -> int:
         return self.engine.game_mode
