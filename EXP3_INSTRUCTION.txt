@@ -1,0 +1,15 @@
+INSTRUCTION:
+Play the game 5-10 times and send the statistics printed at the end of each game to Wiktor Duch.
+
+GAMR LAUNCHING:
+Run 'main.py' with Python 3.
+
+HOW TO PLAY:
+At the bottom of each frame you have an input area. Type one of the letters below and press [ENTER].
+Available letters:
+    - 'a'/'A' - left
+    - 'd'/'D' - right
+    - 'w'/'W' - up
+    - 's'/'S' - down
+    - 'p'/'P' - print your equipment
+    - 'q'/'Q' - quit
