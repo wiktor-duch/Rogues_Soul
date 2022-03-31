@@ -15,7 +15,7 @@ view the dictionaries below.
 The reward is 100 for escaping (using door) and -100 for losing (i.e. ding or
 exceeding step limit).Additionally, an agent gets NUM_SOULS_COLLECTED x 1 
 each time it picks some souls, +1 every time agent discovers new corridor tile
-or room (except the starting one) and -0.1 each time timestep.
+or room (except the starting one).
 
 The game is considered solved once the agent consistently gets 70% of the
 maximum reward. This should be equal to collecting the majority of the souls
@@ -121,7 +121,7 @@ class RoguesSoulsEnv(Env):
         # Spaces
         self.action_space = Discrete(n=self.ACTIONS_LEN)
         self.observation_space = Box(
-            low=0,
+            low=-1,
             high=40,
             shape=(
                 self.engine.world.height+1,
@@ -145,7 +145,8 @@ class RoguesSoulsEnv(Env):
 
     def step(self, key: np.int64) -> Tuple[List[List[int]], int, bool, dict]:
         # Set basic return values
-        reward = -0.1 # Punishing wasting time and too much exploration
+        # reward = -0.1 # Punishing wasting time and too much exploration
+        reward = 0
         done = False
         info = {
             'Completed' : False,
@@ -173,7 +174,8 @@ class RoguesSoulsEnv(Env):
 
             self.engine.handle_enemy_turns()
         
-            if discover_tiles(self.map, self.engine.agent): # Discovers tiles ahead of the agent
+            room_updated, corr_updated = discover_tiles(self.map, self.engine.agent) # Discovers tiles ahead of the agent
+            if room_updated or corr_updated:
                 reward += 1 # Update reward on discovering new area
 
         # Calculate reward

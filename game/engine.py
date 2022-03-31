@@ -1,4 +1,6 @@
 from __future__ import annotations
+from re import S
+from game.statistics import Statistics
 
 from game.handlers import EventHandler
 from game.messages import MessageLog
@@ -34,6 +36,7 @@ class Engine:
         self.game_mode = game_mode # Mode is reseponsible for different game settings
         self.game_over = False
         self.seed = seed
+        self.stats = Statistics(max_lvl=num_levels)
     
     @property
     def level(self):

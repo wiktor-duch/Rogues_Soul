@@ -1,4 +1,5 @@
 from __future__ import annotations
+from game.map_objects.tile import TILE_TYPE
 
 from game.vizualization.render_order import RenderOrder
 from game.components.base_component import BaseComponent
@@ -81,6 +82,9 @@ class Fighter(BaseComponent):
         
         amount_recovered = new_hp - self.hp
         self.hp = new_hp
+        
+        # Update statistics
+        self.engine.stats.hp_gained += amount_recovered
 
         return amount_recovered
     
@@ -113,22 +117,35 @@ class Fighter(BaseComponent):
             self.engine.message_log.add_message(
                 f'{self.parent.name} is dead!'
             )
+            # Update statistics
+            self.engine.stats.enemies_killed += 1
+            if self.engine.level == 1:
+                self.engine.stats.enemies_killed_lvl_1 += 1
+            elif self.engine.level == 2:
+                self.engine.stats.enemies_killed_lvl_2 += 1
+            elif self.engine.level == 3:
+                self.engine.stats.enemies_killed_lvl_3 += 1
 
         # Checks if there is no entity already at this position
         x, y = self.parent.x, self.parent.y
         # TODO: function looking for two entities on one tile
-        if self.parent.map.check_for_duplicates(x, y):
+        if (self.parent.map.check_for_duplicates(x, y)
+            or self.parent.map.tiles[y][x].type == TILE_TYPE.EXIT):
             if (not self.parent.map.is_entity_at(x-1, y)
-                and not self.parent.map.is_blocked(x-1, y)):
+                and not self.parent.map.is_blocked(x-1, y)
+                and self.parent.map.tiles[y][x-1].type != TILE_TYPE.EXIT):
                 self.parent.x -= 1
             elif (not self.parent.map.is_entity_at(x, y-1)
-                and not self.parent.map.is_blocked(x, y-1)):
+                and not self.parent.map.is_blocked(x, y-1)
+                and self.parent.map.tiles[y-1][x].type != TILE_TYPE.EXIT):
                 self.parent.y -= 1
             elif (not self.parent.map.is_entity_at(x+1, y)
-                and not self.parent.map.is_blocked(x+1, y)):
+                and not self.parent.map.is_blocked(x+1, y)
+                and self.parent.map.tiles[y][x+1].type != TILE_TYPE.EXIT):
                 self.parent.x += 1
             elif (not self.parent.map.is_entity_at(x, y+1)
-                and not self.parent.map.is_blocked(x, y+1)):
+                and not self.parent.map.is_blocked(x, y+1)
+                and self.parent.map.tiles[y+1][x].type != TILE_TYPE.EXIT):
                 self.parent.y += 1
             else:
                 self.parent.x = -1

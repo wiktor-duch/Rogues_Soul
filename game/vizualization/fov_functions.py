@@ -20,10 +20,12 @@ def discover_tiles(map: Map, agent: Entity) -> bool:
     - Ig agent is located at the corridor tile, then the next 
       8 nearest tiles are discovered.
 
-    Returns True if tiles were discovered and False otherwise.
+    Returns a pair of boolean values.
+    First one is True if the new room was discovered and False otherwise.
+    Second one is True if the corridor tiles were discovered and False otherwise.
     '''
 
-    is_updated = False
+    room_updated, corr_updated = False, False
     nearest_tiles = get_8_nearest_tiles(map, agent.x, agent.y)
 
     if map.tiles[agent.y][agent.x].type == TILE_TYPE.CORRIDOR:
@@ -31,7 +33,7 @@ def discover_tiles(map: Map, agent: Entity) -> bool:
             if ((tile.type == TILE_TYPE.CORRIDOR or tile.type == TILE_TYPE.ENTRANCE)
                 and tile.discovered is False):
                 tile.discovered = True
-                is_updated = True
+                corr_updated = True
 
     elif map.tiles[agent.y][agent.x].type == TILE_TYPE.ENTRANCE:
         # Check which room agent is about to enter
@@ -41,13 +43,13 @@ def discover_tiles(map: Map, agent: Entity) -> bool:
                 # If room is not discovered yet
                 if map.tiles[room_y][room_x].discovered is False:
                     map.discover_room(room)
-                    is_updated = True
+                    room_updated = True
                 # Discover all corridor tiles around the entrance
                 for tile in nearest_tiles:
                     if ((tile.type == TILE_TYPE.CORRIDOR or tile.type == TILE_TYPE.ENTRANCE)
                         and tile.discovered is False):
                         tile.discovered = True
-                        is_updated = True
+                        corr_updated = True
                 break
-    return is_updated
+    return room_updated, corr_updated
 

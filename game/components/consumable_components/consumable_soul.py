@@ -25,3 +25,13 @@ class ConsumableSoul(Consumable):
         self.engine.message_log.add_message(
             f'Agent consumes {self.amount} souls.'
         )
+
+        # Update statistics
+        if action.item.name == 'Soul':
+            self.engine.stats.souls_collected += 1
+            if self.engine.level == 1:
+                self.engine.stats.souls_collected_lvl_1 += 1
+            elif self.engine.level == 2:
+                self.engine.stats.souls_collected_lvl_2 += 1
+            elif self.engine.level == 3:
+                self.engine.stats.souls_collected_lvl_3 += 1

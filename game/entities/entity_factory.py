@@ -84,7 +84,7 @@ skeleton = Actor(
     name='Skeleton',
     ai_cls=HostileEnemy,
     actor_equipment=ActorsEquipment(),
-    fighter=Fighter(base_hp=10, base_defense=3, base_power=5),
+    fighter=Fighter(base_hp=10, base_defense=2, base_power=5),
     inventory=Inventory(capacity=0)
 )
 
@@ -107,7 +107,7 @@ chest = Item(
     consumable=ConsumableReward(
         pct=0.5,
         num_souls=25,
-        amount_hp=1
+        amount_hp=2
     )
 )
 
@@ -116,18 +116,21 @@ chest = Item(
 short_sword = Equipment(
     char='/',
     name='Short Sword',
+    type='SWORD',
     equippable=ShortSword()
 )
 
 long_sword = Equipment(
     char='/',
     name='Long Sword',
+    type='SWORD',
     equippable=LongSword()
 )
 
 bastard_sword = Equipment(
     char='/',
     name='Bastard Sword',
+    type='SWORD',
     equippable=BastardSword()
 )
 
@@ -135,18 +138,21 @@ bastard_sword = Equipment(
 soldiers_shield = Equipment(
     char='(',
     name='Soldier\'s Shield',
+    type='SHIELD',
     equippable=SoldiersShield()
 )
 
 kite_shield = Equipment(
     char='(',
     name='Kite Shield',
+    type='SHIELD',
     equippable=KiteShield()
 )
 
 greatshield = Equipment(
     char='(',
     name='Greatshield',
+    type='SHIELD',
     equippable=Greatshield()
 )
 
@@ -154,17 +160,20 @@ greatshield = Equipment(
 light_chain_mail = Equipment(
     char='[',
     name='Light Chain Mail',
+    type='ARMOUR',
     equippable=LightChainMail()
 )
 
 cursed_rogues_armour = Equipment(
     char='[',
     name='Cursed Rogue\'s Armour',
+    type='ARMOUR',
     equippable=CursedRoguesArmour()
 )
 
 dragon_armour = Equipment(
     char='[',
     name='Dragon Armour',
+    type='ARMOUR',
     equippable=DragonArmour()
 )

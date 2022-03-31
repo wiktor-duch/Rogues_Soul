@@ -67,11 +67,24 @@ class EventHandler:
             action.perform()
         except exceptions.ImpossibleAction as exc:
             self.engine.message_log.add_message(exc.args[0])
+            self.engine.stats.invalid_actions += 1
             return False  # Skip enemy turn on exceptions.
         
         self.engine.handle_enemy_turns()
         
-        discover_tiles(self.engine.map, self.engine.agent) # Discovers tiles ahead of the agent
+        room_updated, corr_updated =  discover_tiles(self.engine.map, self.engine.agent) # Discovers tiles ahead of the agent
+        # Update statistics
+        if room_updated:
+            self.engine.stats.fov_updates += 1
+            self.engine.stats.rooms_visted += 1
+            if self.engine.num_levels == 1:
+                self.engine.stats.rooms_visited_lvl_1 += 1
+            elif self.engine.num_levels == 2:
+                self.engine.stats.rooms_visited_lvl_2 += 1
+            elif self.engine.num_levels == 3:
+                self.engine.stats.rooms_visited_lvl_3 += 1
+        elif corr_updated:
+            self.engine.stats.fov_updates += 1
         
         return True
 
@@ -84,6 +97,7 @@ class EventHandler:
         if key in MOVE_KEYS:
             dx, dy = MOVE_KEYS[key]
             action = BumpAction(agent, dx, dy)
+            self.engine.stats.valid_actions += 1
 
         # Additional actions used only while playing the game 
         elif key in QUIT_KEYS: # EXIT

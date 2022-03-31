@@ -16,7 +16,8 @@ class MeleeAction(ActionWithDirection):
         # Defense gives the target a chance of avoiding the attack
         if randint(0, target.fighter.defense) == 0:
             # Attack is successful
-            target.fighter.hp -= self.entity.fighter.power
+            # target.fighter.hp -= self.entity.fighter.power
+            target.fighter.take_damage(self.entity.fighter.power)
             if target.ai:
                 self.engine.message_log.add_message(
                     f'{self.entity.name} attacks {target.name}!'
@@ -30,7 +31,7 @@ class MeleeAction(ActionWithDirection):
     
     def perform(self) -> None:
         '''
-        It differs from perform by adding randomness.
+        Allows to perform an attack action.
         '''
         target = self.target_actor
 
@@ -46,6 +47,9 @@ class MeleeAction(ActionWithDirection):
                 self.engine.message_log.add_message(
                     f'{self.entity.name} attacks {target.name} for {damage} HP!'
                 )
+            if self.entity.name != 'Agent':
+                # Update statistics
+                self.engine.stats.hp_lost += damage
             
         else:
             # Attack missed

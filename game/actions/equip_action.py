@@ -32,3 +32,20 @@ class EquipAction(Action):
         
         # Remove the equipment
         self.engine.map.entities.remove(self.equipment)
+
+        # Update statistics
+        self.engine.stats.tot_eqp_collected += 1
+        
+        if self.engine.level == 1:
+            self.engine.stats.eqp_collected_lvl_1 += 1
+        elif self.engine.level == 2:
+            self.engine.stats.eqp_collected_lvl_2 += 1
+        elif self.engine.level == 3:
+            self.engine.stats.eqp_collected_lvl_3 += 1
+        
+        if self.equipment.type == 'SWORD':
+            self.engine.stats.swords_collected += 1
+        elif self.equipment.type == 'SHIELD':
+            self.engine.stats.shields_collected += 1
+        elif self.equipment.type == 'ARMOUR':
+            self.engine.stats.armours_collected += 1

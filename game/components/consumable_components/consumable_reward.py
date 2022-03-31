@@ -24,6 +24,10 @@ class ConsumableReward(Consumable):
             self.engine.message_log.add_message(
                 f'Agent opens {self.parent.name} and gets {self.souls} souls.'
             )
+            # Update statistics
+            if action.item.name == 'Chest':
+                self.engine.stats.opened_rewards += 1
+                self.engine.stats.opened_chests += 1
         else:
             # This chest is a trap
             consumer.fighter.take_damage(amount=self.hp)
@@ -31,4 +35,9 @@ class ConsumableReward(Consumable):
             self.engine.message_log.add_message(
                 f'{self.parent.name} was a trap and Agents loses {self.hp} HP.'
             )
+             # Update statistics
+            if action.item.name == 'Chest':
+                self.engine.stats.hp_lost += self.hp
+                self.engine.stats.opened_traps += 1
+                self.engine.stats.opened_chests += 1
         self.parent.name = 'Opened Chest'

@@ -19,10 +19,12 @@ def place_item(
     max_loops: int,
     item: Item,
     num_items_to_place: int
-) -> None:
+) -> int:
     '''
     Randomly places the given type of items in a provided room. Number of the items
     to be placed must also be specified.
+
+    Returns number of items successfully placed.
     '''
     num_loops = 0
     num_items_placed = 0
@@ -40,6 +42,8 @@ def place_item(
             raise InvalidMap(f'ERROR: Could not generate the minimum number of {item.name} specified!')
 
         num_loops += 1
+    
+    return num_items_placed
 
 def place_equipment(
     map: Map,
@@ -47,10 +51,13 @@ def place_equipment(
     max_loops: int,
     equipment_list: List[Equipment],
     spawn_equipment_prob: float
-) -> None:
+) -> str:
     '''
     Places one piece of equipment if it is not already placed on the map.
+
+    Returns type of equipment placed as a string.
     '''
+    eqp_type = ''
     equipment_available = []
 
     # Check for available equipment
@@ -68,7 +75,7 @@ def place_equipment(
     if len(equipment_available) > 0: # There are pieces of equipment which still can be placed
         # Choose a random piece of equipment
         item = random.choice(equipment_available)
-        
+        eqp_type = item.type
         if random.random() < spawn_equipment_prob:
             num_loops = 0
 
@@ -85,6 +92,7 @@ def place_equipment(
                     raise InvalidMap(f'ERROR: Could not generate the position for equipement to be placed!')
 
                 num_loops += 1
+    return eqp_type
 
 def place_entities(
     map: Map,
@@ -147,9 +155,9 @@ def place_entities(
         
         if num_loops > max_loops:
             raise InvalidMap('ERROR: Could not generate the minimum number of enemies specified!')
-
+    
     # Place health potions
-    place_item(
+    h_potions_placed = place_item(
         map=map,
         room=room,
         max_loops=max_loops,
@@ -158,7 +166,7 @@ def place_entities(
     )
 
     # Place souls
-    place_item(
+    souls_placed = place_item(
         map=map,
         room=room,
         max_loops=max_loops,
@@ -167,7 +175,7 @@ def place_entities(
     )
 
     # Place chests
-    place_item(
+    chests_placed = place_item(
         map=map,
         room=room,
         max_loops=max_loops,
@@ -180,13 +188,29 @@ def place_entities(
         equipment_per_level=equipment_per_level,
         level=level
     )
-    place_equipment(
+    eqp_type = place_equipment(
         map=map,
         room=room,
         max_loops=max_loops,
         equipment_list=equipment_list,
         spawn_equipment_prob=spawn_equipment_prob
     )
+
+    # Update statistics
+    map.engine.stats.num_enemies += num_enemies_placed
+    map.engine.stats.potions_available += h_potions_placed
+    map.engine.stats.num_chests += chests_placed
+    if map.engine.level == 1:
+        map.engine.stats.enemies_lvl_1 += num_enemies_placed
+        map.engine.stats.souls_available_lvl_1 += souls_placed
+    elif map.engine.level == 2:
+        map.engine.stats.enemies_lvl_2 += num_enemies_placed
+        map.engine.stats.souls_available_lvl_2 += souls_placed
+    elif map.engine.level == 3:
+        map.engine.stats.enemies_lvl_3 += num_enemies_placed
+        map.engine.stats.souls_available_lvl_3 += souls_placed
+    if len(eqp_type) != 0:
+        map.engine.stats.eqp_available += 1
 
 def place_exit(map: Map) -> None:
     # Places the exit
@@ -465,10 +489,26 @@ def generate_dungeon(
         if not intersection:
             # There are no intersections, so this room is valid
             add_room_to_dungeon(dungeon, new_room)
+            # Update statistics
+            engine.stats.tot_rooms += 1
+            if engine.level == 1:
+                engine.stats.rooms_lvl_1 += 1
+            elif engine.level == 2:
+                engine.stats.rooms_lvl_2 += 1
+            elif engine.level == 3:
+                engine.stats.rooms_lvl_3 += 1
 
             if num_rooms == 0:
                 # Agent starts at this room
                 agent.place(*new_room.center, dungeon)
+                # Update statistics
+                engine.stats.rooms_visted += 1
+                if engine.level == 1:
+                    engine.stats.rooms_visited_lvl_1 += 1
+                elif engine.level == 2:
+                    engine.stats.rooms_visited_lvl_2 += 1
+                elif engine.level == 3:
+                    engine.stats.rooms_visited_lvl_3 += 1
                 # Room is discovered
                 dungeon.discover_room(new_room)
             else:
@@ -510,6 +550,15 @@ def generate_dungeon(
             if not intersection:
                 # There are no intersections, so this room is valid
                 add_room_to_dungeon(dungeon, new_room)
+                # Update statistics
+                engine.stats.tot_rooms += 1
+                if engine.level == 1:
+                    engine.stats.rooms_lvl_1 += 1
+                elif engine.level == 2:
+                    engine.stats.rooms_lvl_2 += 1
+                elif engine.level == 3:
+                    engine.stats.rooms_lvl_3 += 1
+
                 place_entities(
                     map=dungeon,
                     level=level,

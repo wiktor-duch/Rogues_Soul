@@ -20,3 +20,7 @@ class ConsumableHealing(Consumable):
         self.engine.message_log.add_message(
             f'Agent consumes {self.parent.name} and recover {amount_recovered} HP.'
         )
+
+        # Update statistics
+        if action.item.name == 'Health Potion':
+            self.engine.stats.potions_used += 1

@@ -16,6 +16,7 @@ class Equipment(Entity):
         y: int = 0,
         char: str = 'U',
         name: str = '<Unnamed>',
+        type: str = '<Unknown>',
         equippable: Equippable
     ):
         super().__init__(
@@ -30,3 +31,4 @@ class Equipment(Entity):
         self.equippable = equippable
         self.equippable.parent = self
         self.active = True
+        self.type = type

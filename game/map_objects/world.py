@@ -82,6 +82,7 @@ class World:
                 map_height = self.height,
                 engine=self.engine
             )
+            self.engine.stats.levels_completed = self.current_level - 1
         except InvalidMap as exc:
             self.current_level -= 1
             raise exc
