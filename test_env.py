@@ -7,7 +7,7 @@ from stable_baselines3.common.env_checker import check_env
 
 if __name__ == '__main__':
     print('Loading the env: Rogue\'s Soul')
-    env = RoguesSoulsEnv()
+    env = RoguesSoulsEnv(100)
 
     # Check spaces
     print('\nACTION SPACE\n')

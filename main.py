@@ -1,9 +1,9 @@
 import traceback
 import time
-from game.setup_configs.demo_setup import new_engine, new_map
+from game.setup_configs.exp3_setup import new_engine, new_map
 
 '''
-Based on:
+Adapted from:
 http://rogueliketutorials.com/tutorials/tcod/v2/
 '''
 
@@ -31,11 +31,7 @@ def main():
                 print('CONGRATULATIONS!\nYou managed to escape from your nightmare.\n')
         end_time = time.time()
         # Update and print stats
-        engine.stats.time_elapsed = (int(end_time-start_time))
-        engine.stats.hp = engine.agent.fighter.max_hp
-        engine.stats.defense = engine.agent.fighter.defense
-        engine.stats.power = engine.agent.fighter.power
-        engine.stats.souls = engine.agent.souls
+        engine.update_stats(int(end_time-start_time))
         # Display statistics
         engine.stats.display()
 if __name__ == '__main__':

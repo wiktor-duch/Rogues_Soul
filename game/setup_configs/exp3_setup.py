@@ -1,5 +1,6 @@
 '''
 Handles initialization of game.
+
 Adapted from:
 http://rogueliketutorials.com/tutorials/tcod/v2/
 '''
@@ -18,33 +19,41 @@ def new_engine(render_info:bool = False, verbose:bool = False) -> Engine:
     '''
 
     # ENGINE CONFIGURATION
-    num_levels = 1
+    num_levels = 3
     game_mode = 0 # Hides the undiscovered tiles if 0 and shows all tiles if 1
 
     # SPACE CONFIGURATION
-    map_width = 25
-    map_height = 25
+    map_width = 50  # (tiles)
+    # NOTE: Width should be above 10 to render statistics bar (see helper functions) 
+    map_height = 25  # (tiles)
     
     # Room sizes means the dimensions inside the room (NOT COUNTING WALLS)
-    room_max_size = 6
+    room_max_size = 8
     room_min_size = 4 # Should not be below 4 as otherwise it may generate errors
     num_rooms_per_level: List[Tuple[int, int, int]] = [
         # Level, Min, Max
-        (1, 3, 3)
+        (1, 3, 4),
+        (2, 4, 6),
+        (3, 5, 8)
     ]
 
     # ENTITY CONFIGURATION
     num_enemies_per_level: List[Tuple[int, int, int]] = [
         # Level, Min, Max
-        (1, 1, 3)
+        (1, 1, 2),
+        (2, 2, 2),
+        (3, 2, 3)
     ]
     enemy_types_per_level: Dict[int, List[Tuple[Actor, int]]] = {
         # Key: Level, Value: [(Entity, Percentage)...]
-        1: [(entity_factory.bat, 80), (entity_factory.demon, 20)],
+        1: [(entity_factory.bat, 90), (entity_factory.demon, 10)],
+        2: [(entity_factory.crow, 70), (entity_factory.lost_knight, 30)],
+        3: [(entity_factory.rat, 50), (entity_factory.skeleton, 50)]
     }
     num_health_potions_per_level: List[Tuple[int, int, int]] = [
         # Level, Min, Max
-        (1, 0, 1)
+        (1, 1, 1),
+        (2, 0, 1)
     ]
     num_souls_per_level: List[Tuple[int, int, int]] = [
         # Level, Min, Max
@@ -66,10 +75,15 @@ def new_engine(render_info:bool = False, verbose:bool = False) -> Engine:
             entity_factory.long_sword,
             entity_factory.kite_shield,
             entity_factory.cursed_rogues_armour
+        ],
+        3: [
+            entity_factory.bastard_sword,
+            entity_factory.greatshield,
+            entity_factory.dragon_armour
         ]
     }
     # The higher, the more pieces of equipment can be placed on the map
-    spawn_equipment_prob = 0.75
+    spawn_equipment_prob = 0.6
 
     if render_info:
         render_game_intro()

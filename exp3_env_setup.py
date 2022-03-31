@@ -1,50 +1,61 @@
 '''
-Handles initialization of game.
-Adapted from:
-http://rogueliketutorials.com/tutorials/tcod/v2/
+Handles initialization of the engine for the OpenAI custom environment.
 '''
 from copy import deepcopy
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 
 from game.engine import Engine
 from game.entities import Actor, entity_factory, Equipment
 from game.exceptions import InvalidMap
 from game.map_objects import World
-from game.vizualization import render_game_intro
 
-def new_engine(render_info:bool = False, verbose:bool = False) -> Engine:
+def new_engine(
+    verbose: bool = False,
+    prev_mode: int = 0,
+    prev_seed: Optional[int] = None
+) -> Engine:
     '''
     Returns a new game session as an Engine instance.
+
+    Passing the previous game mode and seed is possible.
     '''
 
-    # ENGINE CONFIGURATION
-    num_levels = 1
+    # GENERAL CONFIGURATION
+    num_levels = 3
     game_mode = 0 # Hides the undiscovered tiles if 0 and shows all tiles if 1
 
     # SPACE CONFIGURATION
-    map_width = 25
-    map_height = 25
+    map_width = 50  # (tiles)
+    # NOTE: Width should be above 10 to render statistics bar (see helper functions) 
+    map_height = 25  # (tiles)
     
     # Room sizes means the dimensions inside the room (NOT COUNTING WALLS)
-    room_max_size = 6
+    room_max_size = 8
     room_min_size = 4 # Should not be below 4 as otherwise it may generate errors
     num_rooms_per_level: List[Tuple[int, int, int]] = [
         # Level, Min, Max
-        (1, 3, 3)
+        (1, 3, 4),
+        (2, 4, 6),
+        (3, 5, 8)
     ]
 
     # ENTITY CONFIGURATION
     num_enemies_per_level: List[Tuple[int, int, int]] = [
         # Level, Min, Max
-        (1, 1, 3)
+        (1, 1, 2),
+        (2, 2, 2),
+        (3, 2, 3)
     ]
     enemy_types_per_level: Dict[int, List[Tuple[Actor, int]]] = {
         # Key: Level, Value: [(Entity, Percentage)...]
-        1: [(entity_factory.bat, 80), (entity_factory.demon, 20)],
+        1: [(entity_factory.bat, 90), (entity_factory.demon, 10)],
+        2: [(entity_factory.crow, 70), (entity_factory.lost_knight, 30)],
+        3: [(entity_factory.rat, 50), (entity_factory.skeleton, 50)]
     }
     num_health_potions_per_level: List[Tuple[int, int, int]] = [
         # Level, Min, Max
-        (1, 0, 1)
+        (1, 1, 1),
+        (2, 0, 1)
     ]
     num_souls_per_level: List[Tuple[int, int, int]] = [
         # Level, Min, Max
@@ -66,24 +77,25 @@ def new_engine(render_info:bool = False, verbose:bool = False) -> Engine:
             entity_factory.long_sword,
             entity_factory.kite_shield,
             entity_factory.cursed_rogues_armour
+        ],
+        3: [
+            entity_factory.bastard_sword,
+            entity_factory.greatshield,
+            entity_factory.dragon_armour
         ]
     }
     # The higher, the more pieces of equipment can be placed on the map
-    spawn_equipment_prob = 0.75
-
-    if render_info:
-        render_game_intro()
-
+    spawn_equipment_prob = 0.6
     if verbose:
-        print('Loading Rogue\'s Soul...')
+        print('Engine configuration loaded...')
 
     # Spawns an agent
     agent = deepcopy(entity_factory.agent)
     if verbose:
-        print('Player/Agent spawned...')
+        print('Agent spawned...')
 
     #Initializes engine
-    engine = Engine(agent, num_levels, game_mode)
+    engine = Engine(agent, num_levels, game_mode, prev_seed)
 
     # Initializes world
     engine.world = World(
@@ -101,6 +113,9 @@ def new_engine(render_info:bool = False, verbose:bool = False) -> Engine:
         spawn_equipment_prob = spawn_equipment_prob,
         equipment_per_level = equipment_per_level
     )
+    if verbose:
+        print('World initialized...')
+
     return engine
 
 def new_map(engine:Engine, verbose:bool=False) -> bool:
@@ -110,17 +125,13 @@ def new_map(engine:Engine, verbose:bool=False) -> bool:
     Returns True if map was correctly generated and False otherwise.
     '''
     
-    if verbose:
-        print('Generating the dungeon...')
-    
-    # Create map
+    # Create a new dungeon
     try:
         engine.world.generate_level()
+        if verbose:
+            print('New level generated...\n')
     except InvalidMap as exc:
-        print(f'Error occured while map generation.\n{exc}')
+        print(f'Error: Could not generated the level.\nError Message: {exc}')
         return False
-    
-    if verbose:
-        print('Dungeon generated...\n')
     
     return True

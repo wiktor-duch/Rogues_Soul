@@ -35,13 +35,14 @@ Created by Wiktor Duch.
 Game based on: http://rogueliketutorials.com/tutorials/tcod/v2/.
 '''
 
+from xmlrpc.client import boolean
 import numpy as np
 from typing import Any, Tuple
 from gym import Env
 from gym.spaces import Box, Discrete
 from typing import List, Optional
 
-import env_setup as setup
+import exp3_env_setup as setup
 from game.actions import BumpAction
 from game.entities import Item, Equipment, Actor
 from game.vizualization import discover_tiles
@@ -143,7 +144,7 @@ class RoguesSoulsEnv(Env):
     def map(self) -> Map:
         return self.engine.map
 
-    def step(self, key: np.int64) -> Tuple[List[List[int]], int, bool, dict]:
+    def step(self, key: np.int64, print_stats:boolean = True) -> Tuple[List[List[int]], int, bool, dict]:
         # Set basic return values
         # reward = -0.1 # Punishing wasting time and too much exploration
         reward = 0
@@ -168,7 +169,9 @@ class RoguesSoulsEnv(Env):
             try:
                 action = BumpAction(self.engine.agent, dx, dy)
                 action.perform()
+                self.engine.stats.valid_actions += 1
             except:
+                self.engine.stats.invalid_actions += 1
                 # Do nothing
                 pass
 
@@ -177,6 +180,19 @@ class RoguesSoulsEnv(Env):
             room_updated, corr_updated = discover_tiles(self.map, self.engine.agent) # Discovers tiles ahead of the agent
             if room_updated or corr_updated:
                 reward += 1 # Update reward on discovering new area
+
+            # Update statistics
+            if room_updated:
+                self.engine.stats.fov_updates += 1
+                self.engine.stats.rooms_visted += 1
+                if self.engine.level == 1:
+                    self.engine.stats.rooms_visited_lvl_1 += 1
+                elif self.engine.level == 2:
+                    self.engine.stats.rooms_visited_lvl_2 += 1
+                elif self.engine.level == 3:
+                    self.engine.stats.rooms_visited_lvl_3 += 1
+            elif corr_updated:
+                self.engine.stats.fov_updates += 1
 
         # Calculate reward
         if self.engine.game_over is True:
@@ -196,6 +212,12 @@ class RoguesSoulsEnv(Env):
             pass
         
         self.state = self.get_next_observation()
+
+        # Update statistics
+        if done:
+            self.engine.update_stats()
+            if print_stats:
+                self.engine.stats.display()
 
         return self.state, reward, done, info
 
@@ -240,6 +262,9 @@ class RoguesSoulsEnv(Env):
         self.state = self.get_next_observation()
 
         return self.state
+
+    def set_test_and_eval_sets(self, test_size:int, eval_size:int):
+        pass
 
     def set_seed(self, seed: int) -> None:
         '''
