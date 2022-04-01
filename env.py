@@ -42,7 +42,7 @@ from gym.spaces import Box, Discrete
 from typing import List, Optional
 import random
 
-import exp3_env_setup as setup
+import exp1_env_setup as setup
 from game.actions import BumpAction
 from game.entities import Item, Equipment, Actor
 from game.vizualization import discover_tiles

@@ -23,5 +23,5 @@ class Greatshield(Equippable):
     def __init__(self) -> None:
         super().__init__(
             equipment_type=EquipmentType.SHIELD,
-            defense_bonus=4
+            defense_bonus=3
         )
