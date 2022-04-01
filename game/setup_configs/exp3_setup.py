@@ -83,7 +83,7 @@ def new_engine(render_info:bool = False, verbose:bool = False) -> Engine:
         ]
     }
     # The higher, the more pieces of equipment can be placed on the map
-    spawn_equipment_prob = 0.6
+    spawn_equipment_prob = 0.85
 
     if render_info:
         render_game_intro()

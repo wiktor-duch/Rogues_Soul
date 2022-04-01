@@ -79,7 +79,7 @@ lost_knight = Actor(
     name='Knight',
     ai_cls=HostileEnemy,
     actor_equipment=ActorsEquipment(),
-    fighter=Fighter(base_hp=8, base_defense=2, base_power=4),
+    fighter=Fighter(base_hp=8, base_defense=2, base_power=5),
     inventory=Inventory(capacity=0)
 )
 
@@ -88,7 +88,7 @@ skeleton = Actor(
     name='Skeleton',
     ai_cls=HostileEnemy,
     actor_equipment=ActorsEquipment(),
-    fighter=Fighter(base_hp=10, base_defense=2, base_power=5),
+    fighter=Fighter(base_hp=10, base_defense=2, base_power=6),
     inventory=Inventory(capacity=0)
 )
 
