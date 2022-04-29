@@ -42,7 +42,7 @@ from gym.spaces import Box, Discrete
 from typing import List, Optional
 import random
 
-import exp1_env_setup as setup
+import exp3_env_setup as setup
 from game.actions import BumpAction
 from game.entities import Item, Equipment, Actor
 from game.vizualization import discover_tiles
@@ -88,7 +88,8 @@ class RoguesSoulsEnv(Env):
     item_to_int = {
         'Health Potion' : 20,
         'Soul' : 21,
-        'Chest' : 22
+        'Chest' : 22,
+        'Opened Chest': 23
     }
 
     # Pieces of equipment have values 30-39
@@ -107,6 +108,7 @@ class RoguesSoulsEnv(Env):
     def __init__(
         self,
         max_steps: int = 1000,
+        print_stats:bool = False
     ) -> None:
 
         # Game settings
@@ -126,9 +128,9 @@ class RoguesSoulsEnv(Env):
             high=40,
             shape=(
                 self.engine.world.height+1,
-                self.engine.world.width,
+                self.engine.world.width
             ),
-            dtype=np.int8
+            dtype=np.int16
         )
         self.state = self.get_next_observation()
 
@@ -142,6 +144,8 @@ class RoguesSoulsEnv(Env):
         self.eval: bool = False
         self.test_set: List[int] = list()
         self.eval_set: List[int] = list()
+        # Statistics
+        self.print_stats:bool = print_stats
 
     @property
     def unwrapped(self) -> Env:
@@ -151,7 +155,7 @@ class RoguesSoulsEnv(Env):
     def map(self) -> Map:
         return self.engine.map
 
-    def step(self, key: np.int64, print_stats:bool = True) -> Tuple[List[List[int]], int, bool, dict]:
+    def step(self, key: np.int8) -> Tuple[List[List[int]], int, bool, dict]:
         # Set basic return values
         # reward = -0.1 # Punishing wasting time and too much exploration
         reward = 0
@@ -221,10 +225,10 @@ class RoguesSoulsEnv(Env):
         self.state = self.get_next_observation()
 
         # Update statistics
-        if done:
-            self.engine.update_stats()
-            if print_stats:
-                self.engine.stats.display()
+        # if done:
+        #     self.engine.update_stats()
+        #     if self.print_stats:
+        #         self.engine.stats.display()
 
         return self.state, reward, done, info
 

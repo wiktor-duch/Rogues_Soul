@@ -35,7 +35,7 @@ class ConsumableReward(Consumable):
             self.engine.message_log.add_message(
                 f'{self.parent.name} was a trap and Agents loses {self.hp} HP.'
             )
-             # Update statistics
+            # Update statistics
             if action.item.name == 'Chest':
                 self.engine.stats.hp_lost += self.hp
                 self.engine.stats.opened_traps += 1

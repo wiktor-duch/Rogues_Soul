@@ -1,8 +1,8 @@
 from env import RoguesSoulsEnv
 
-env = RoguesSoulsEnv(max_steps=500)
-env.set_seed(4)
-env.set_mode(1)
+env = RoguesSoulsEnv(max_steps=50)
+env.set_seed(6)
+# env.set_mode(1)
 state = env.reset() # Needs resetting to apply above changes
 # env.render(mode='human')
 
@@ -15,7 +15,7 @@ print(type(state))
 
 # Load Model
 from stable_baselines3 import DQN
-model = DQN.load('./models/colab-exp-1/custom_rew_fun_6_75_')
+model = DQN.load('./models/exp3_models/rev_550_limit_20')
 
 import time
 episodes = 2
@@ -29,8 +29,8 @@ for e in range(1, episodes+1):
     while not done:
         env.render()
         # input('[ENTER]')
-        time.sleep(2)
-        action, _ = model.predict(obs)
+        time.sleep(1)
+        action, _ = model.predict(obs, deterministic=True)
         obs, reward, done, info = env.step(int(action))
         score += reward
     

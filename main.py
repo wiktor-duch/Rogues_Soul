@@ -33,6 +33,6 @@ def main():
         # Update and print stats
         engine.update_stats(int(end_time-start_time))
         # Display statistics
-        engine.stats.display()
+        # engine.stats.display()
 if __name__ == '__main__':
     main()
